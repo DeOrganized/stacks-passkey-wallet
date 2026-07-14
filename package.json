@@ -27,7 +27,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "gen:vectors": "tsx scripts/generate-vectors.ts"
+    "gen:vectors": "tsx scripts/generate-vectors.ts",
+    "demo": "vite --config demo/vite.config.ts",
+    "demo:build": "vite build --config demo/vite.config.ts"
   },
   "dependencies": {
     "@noble/hashes": "^2.2.0",
@@ -43,6 +45,7 @@
     "tsup": "^8.5.1",
     "tsx": "^4",
     "typescript": "^5.7.0",
+    "vite": "^8.0.0",
     "vitest": "^4.1.0"
   }
 }

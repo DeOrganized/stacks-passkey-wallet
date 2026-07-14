@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>stacks-passkey-wallet — demo</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; color: #111; }
+      h1 { font-size: 1.4rem; }
+      button { display: block; width: 100%; margin: 0.4rem 0; padding: 0.7rem; font-size: 1rem; cursor: pointer; border: 1px solid #ccc; border-radius: 8px; background: #fafafa; }
+      button:hover { background: #f0f0f0; }
+      #guidance { color: #a15c00; background: #fff6e5; padding: 0.6rem 0.8rem; border-radius: 8px; margin: 0.5rem 0; }
+      #guidance:empty { display: none; }
+      pre { background: #0b1021; color: #d6e2ff; padding: 1rem; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; min-height: 3rem; }
+      .warn { color: #7a1212; font-size: 0.9rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Passkey → Stacks + Bitcoin wallet</h1>
+    <p>
+      Standalone demo of the <code>stacks-passkey-wallet</code> reference library. No backend, no
+      DeOrganized dependency — one passkey deterministically derives a Stacks + Bitcoin wallet.
+    </p>
+    <p class="warn">
+      Demo only. This is a hot wallet; keys live briefly in page memory. Do not use with real funds.
+    </p>
+    <div id="guidance"></div>
+    <button id="create">1 · Create passkey (PRF)</button>
+    <button id="derive">2 · Derive Stacks + Bitcoin addresses</button>
+    <button id="sign">3 · Sign a test message (Stacks)</button>
+    <button id="export">Export seed phrase (backup, shown once)</button>
+    <pre id="out"></pre>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
