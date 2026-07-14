@@ -18,3 +18,6 @@ export * from "./derivation";
 
 // Signing: Stacks message signing + Bitcoin PSBT signing (derive → sign → discard).
 export * from "./signing";
+
+// PRF layer: passkey create/evaluate, support detection, provider steering.
+export * from "./prf";
