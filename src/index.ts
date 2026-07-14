@@ -21,3 +21,6 @@ export * from "./signing";
 
 // PRF layer: passkey create/evaluate, support detection, provider steering.
 export * from "./prf";
+
+// Seed export: gated, reveal-once backup flow (spec A3).
+export * from "./export";

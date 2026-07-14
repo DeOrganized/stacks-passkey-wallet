@@ -33,3 +33,17 @@ export class InvalidPrfOutputError extends PasskeyWalletError {}
 
 /** Thrown when HD key derivation cannot produce the required key material. */
 export class KeyDerivationError extends PasskeyWalletError {}
+
+/** Thrown when seed export is attempted without acknowledging the backup warning (spec A3). */
+export class BackupNotAcknowledgedError extends PasskeyWalletError {
+  constructor() {
+    super("Backup warning must be acknowledged before the seed phrase can be revealed.");
+  }
+}
+
+/** Thrown when a one-time SeedExport is revealed more than once. */
+export class SeedAlreadyRevealedError extends PasskeyWalletError {
+  constructor() {
+    super("Seed phrase was already revealed once; perform a fresh export to view it again.");
+  }
+}
