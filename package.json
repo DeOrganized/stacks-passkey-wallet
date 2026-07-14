@@ -1,9 +1,16 @@
 {
   "name": "stacks-passkey-wallet",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Passkey-derived wallet reference implementation for Stacks and Bitcoin — WebAuthn PRF → deterministic HD wallet",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeOrganized/stacks-passkey-wallet.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": false,
   "exports": {
     ".": {
@@ -29,7 +36,10 @@
     "test:watch": "vitest",
     "gen:vectors": "tsx scripts/generate-vectors.ts",
     "demo": "vite --config demo/vite.config.ts",
-    "demo:build": "vite build --config demo/vite.config.ts"
+    "demo:build": "vite build --config demo/vite.config.ts",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build && npm test",
+    "publish:check": "npm run build && npm pack --dry-run"
   },
   "dependencies": {
     "@noble/hashes": "^2.2.0",

@@ -1,0 +1,16 @@
+# The published package ships ONLY the built library (see package.json "files":
+# dist, README, LICENSE). This .npmignore's presence stops npm from falling back
+# to .gitignore — which excludes dist/ — so the build is included in the tarball.
+# dist/ is (re)built by the "prepare" script on publish.
+src
+test
+demo
+scripts
+docs
+.github
+.claude
+*.config.ts
+tsconfig.json
+CLAUDE.md
+.gitattributes
+*.tsbuildinfo
