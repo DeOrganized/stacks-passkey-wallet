@@ -15,3 +15,6 @@ export * from "./errors";
 
 // Derivation: paths, seed pipeline, per-chain accounts, and the convenience API.
 export * from "./derivation";
+
+// Signing: Stacks message signing + Bitcoin PSBT signing (derive → sign → discard).
+export * from "./signing";

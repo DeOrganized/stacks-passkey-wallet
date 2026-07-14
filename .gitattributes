@@ -1,0 +1,5 @@
+# Normalize line endings so the public repo history stays consistent across OSes.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
