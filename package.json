@@ -1,0 +1,48 @@
+{
+  "name": "stacks-passkey-wallet",
+  "version": "0.0.0",
+  "description": "Passkey-derived wallet reference implementation for Stacks and Bitcoin — WebAuthn PRF → deterministic HD wallet",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "gen:vectors": "tsx scripts/generate-vectors.ts"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.2.0",
+    "@scure/bip32": "^2.2.0",
+    "@scure/bip39": "^2.2.0",
+    "@scure/btc-signer": "^2.2.0",
+    "@stacks/transactions": "^7.5.0"
+  },
+  "devDependencies": {
+    "@stacks/wallet-sdk": "^7.0.0",
+    "@types/node": "^22",
+    "bitcoinjs-lib": "^7.0.1",
+    "tsup": "^8.5.1",
+    "tsx": "^4",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.0"
+  }
+}

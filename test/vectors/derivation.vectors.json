@@ -1,0 +1,72 @@
+{
+  "_comment": "FROZEN wallet-identity vectors — see docs/wallet-identity.md. Inputs are fixed public byte patterns (test vectors, not real wallets). Regenerating with different constants is a breaking change.",
+  "salt": "stacks-passkey-wallet/v1",
+  "hkdf": {
+    "hash": "SHA-256",
+    "info": "stacks-passkey-wallet/bip39-entropy/v1",
+    "saltSource": "utf8(PRF salt)",
+    "outputBytes": 32
+  },
+  "crossValidatedWith": [
+    "@stacks/wallet-sdk",
+    "bitcoinjs-lib"
+  ],
+  "vectors": [
+    {
+      "name": "all-zero",
+      "prfBytesHex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "salt": "stacks-passkey-wallet/v1",
+      "mnemonic": "virtual mansion kind trip pyramid dilemma move load aerobic dwarf senior journey destroy split pudding often cannon autumn kangaroo aware response say candy soft",
+      "stacks": {
+        "path": "m/44'/5757'/0'/0/0",
+        "address": "SP37B02PN2BK8T1DCEQBF8E0MD5B6CQ06Y25J1AYH"
+      },
+      "bitcoin": {
+        "path": "m/84'/0'/0'/0/0",
+        "address": "bc1qjyexgupjwsfy3uuxec724salu4ax24pemyxzh7"
+      }
+    },
+    {
+      "name": "all-ff",
+      "prfBytesHex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "salt": "stacks-passkey-wallet/v1",
+      "mnemonic": "alarm fix bless educate family tube blind guilt elbow math current hour champion unknown lab upgrade resist defense can hungry gather shrug inhale abuse",
+      "stacks": {
+        "path": "m/44'/5757'/0'/0/0",
+        "address": "SP2VRDRY5G0KFBKTSWFBHDY4W6AXH2BDJR4MH0SW3"
+      },
+      "bitcoin": {
+        "path": "m/84'/0'/0'/0/0",
+        "address": "bc1q5rxm5xfvkkk6jjwcj9frg793c7an4r0nveyet9"
+      }
+    },
+    {
+      "name": "counter-0..31",
+      "prfBytesHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "salt": "stacks-passkey-wallet/v1",
+      "mnemonic": "ostrich sport viable spoon have valid view arena offer suit intact series flee spike betray achieve process actual become mutual kite potato sauce tenant",
+      "stacks": {
+        "path": "m/44'/5757'/0'/0/0",
+        "address": "SP5Y2VZYN3B1Y38AQR1970XYBN3QF0D0A0PXRPZ7"
+      },
+      "bitcoin": {
+        "path": "m/84'/0'/0'/0/0",
+        "address": "bc1qcgendxv6rmfzzzd352vrddl8dgez4j7xv7cudj"
+      }
+    },
+    {
+      "name": "sha256-tagged",
+      "prfBytesHex": "05b6bebbe34ec24fe1108362cebb1519824ee7aa8de565dcd7ad2051d95b3be1",
+      "salt": "stacks-passkey-wallet/v1",
+      "mnemonic": "detail tent replace region leopard wrap robot core narrow trophy kind crack beef amateur forward parent today hurdle firm road cereal muscle spatial section",
+      "stacks": {
+        "path": "m/44'/5757'/0'/0/0",
+        "address": "SP3JA93Y4FPDNZ9QVXXSBATCZKB0QE60CQ0W61DG9"
+      },
+      "bitcoin": {
+        "path": "m/84'/0'/0'/0/0",
+        "address": "bc1qaap04trkz6qtghsrsg2dq872k35vk0up7y6sjl"
+      }
+    }
+  ]
+}
