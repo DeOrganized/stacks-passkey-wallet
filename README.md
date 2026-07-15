@@ -1,5 +1,11 @@
 # stacks-passkey-wallet
 
+> ⚠️ **Pre-release — v0.1.0.** Production hardening is in progress and the
+> cross-device PRF support matrix is **incomplete** (see
+> [`docs/prf-support-matrix.md`](docs/prf-support-matrix.md)). Adopters inherit
+> these caveats: pin an exact version, and verify on your target passkey
+> providers before relying on it for funds.
+
 Passkey-derived wallet reference implementation for Stacks and Bitcoin —
 WebAuthn PRF → deterministic HD wallet. **MIT licensed. Clean-room** from the
 WebAuthn PRF, BIP-39, BIP-32/44/84 and RFC 5869 specifications.
