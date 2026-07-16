@@ -88,8 +88,9 @@ All production cryptography uses one consistent family: `@scure/bip39`,
 `@scure/bip32`, `@noble/hashes` (including HKDF), `@noble/curves`, and
 `@scure/btc-signer`. Why:
 
-- **One audited, minimal-dependency family.** These libraries are audited, carry a
-  very small dependency surface, and share a maintainer and design philosophy —
+- **One audited, minimal-dependency family.** These libraries are independently
+  audited (audit reports are linked from each library's repository), carry a very
+  small dependency surface, and share a maintainer and design philosophy —
   reducing supply-chain risk and version-skew between, e.g., the BIP-39 and BIP-32
   implementations.
 - **Browser-first.** They are ESM-native, tree-shakeable, and free of Node-only
