@@ -76,3 +76,53 @@ Warn explicitly that a *new* passkey is a *new, empty* wallet, not a backup.
 Emit your existing event types (`wallet.passkey_created`, `wallet.revealed`,
 `wallet.backup_confirmed`, `wallet.first_tx`) at the corresponding points. The
 library is agnostic to this; it lives in the host app.
+
+## 6. Server verification: `expected_origin` must match the browser origin exactly
+
+The WebAuthn response carries the *exact* origin the ceremony ran in
+(`clientDataJSON.origin`, e.g. `https://www.example.com`). Your server's
+`expected_origin` must match it exactly — scheme, host, and port. A bare-apex
+value (`https://example.com`) will reject a ceremony that actually ran on the
+`www.` host, and vice versa.
+
+The trap is that the RP ID and the origin have *different* matching rules:
+
+- **RP ID** matches by registrable-domain suffix, so `example.com` is a valid RP
+  ID for a page on `www.example.com`. `navigator.credentials.create()` succeeds
+  and a passkey is minted in the authenticator.
+- **Origin** matches *exactly*, so if `expected_origin` names the wrong host,
+  `verify` rejects the response even though creation "worked".
+
+The symptom is distinctive: a credential exists in the authenticator (keychain /
+password manager) with **no server-side record**, registration never completes,
+and later sign-in fails as "unknown credential". Most often the cause is an
+apex↔www redirect you forgot about — the site is served at
+`https://www.example.com` (the apex 301-redirects to it), so every ceremony's
+origin is the `www` host even though your config named the apex.
+
+Fix, in order of preference:
+
+1. Serve the app from a single canonical origin and set `expected_origin` to it.
+2. If both hostnames are reachable, **accept both** — `expected_origin` may be a
+   list (py_webauthn accepts `str | list[str]`); include every origin the app
+   can run under, e.g. `["https://example.com", "https://www.example.com"]`.
+
+Check your host/CDN redirect config to learn which origin users actually land
+on. When in doubt, log `clientDataJSON.origin` from a real ceremony and compare
+it byte-for-byte against `expected_origin`.
+
+## 7. Restoring into a multi-account wallet (e.g. Xverse)
+
+Some wallets scan more than one multi-account derivation convention when they
+restore a recovery phrase, so importing the exported seed can show **two
+"wallets"/accounts for the same phrase** — Xverse does this, for example. This
+is expected, not a bug. **Account 0 is identical across both conventions** — it
+is the account this library derives (Stacks `m/44'/5757'/0'/0/0`, Bitcoin
+native segwit `m/84'/0'/0'/0/0`) and the one that holds the funds. The
+conventions only diverge at account index ≥ 1, which is out of Milestone-1
+scope.
+
+Host-app guidance: tell users that seeing two accounts is normal and their
+funds are on the first / account-0 entry. When verifying a restore, match the
+address *type* — native segwit (`bc1q…`) for Bitcoin, the `SP…`/`ST…` Stacks
+account address — and expect no BIP39 passphrase.
