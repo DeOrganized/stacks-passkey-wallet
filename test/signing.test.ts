@@ -4,7 +4,8 @@ import * as btc from "@scure/btc-signer";
 import { hashMessage as refHashMessage } from "@stacks/encryption";
 
 import { prfBytesToRoot } from "../src/derivation/seed";
-import { BITCOIN_NATIVE_SEGWIT_PATH } from "../src/derivation/paths";
+import { BITCOIN_NATIVE_SEGWIT_PATH, bitcoinNativeSegwitPath } from "../src/derivation/paths";
+import { deriveBitcoinAccount } from "../src/derivation/bitcoin";
 import {
   hashStacksMessage,
   signBitcoinPsbt,
@@ -60,5 +61,32 @@ describe("Bitcoin PSBT signing", () => {
     tx.finalize();
     expect(tx.getInput(0).finalScriptWitness).toBeDefined();
     expect(tx.id).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  // Coherence: a PSBT whose input pays the TESTNET account (coin type 1') must be
+  // signable with network:"testnet". If signing derived at the mainnet path (the
+  // pre-fix bug), the key wouldn't match the input's script and 0 inputs sign.
+  it("signs a testnet input — signing key matches the testnet address (coin type 1')", () => {
+    const { root } = prfBytesToRoot(prf);
+    let psbt: Uint8Array;
+    try {
+      const node = root.derive(bitcoinNativeSegwitPath(0, "testnet"));
+      const wpkh = btc.p2wpkh(node.publicKey!, btc.TEST_NETWORK);
+      // The input's script must correspond to the testnet account address.
+      expect(wpkh.address).toBe(deriveBitcoinAccount(root, "testnet").address);
+      const tx = new btc.Transaction();
+      tx.addInput({
+        txid: hexToBytes("22".repeat(32)),
+        index: 0,
+        witnessUtxo: { script: wpkh.script, amount: 100_000n },
+      });
+      tx.addOutputAddress(wpkh.address!, 90_000n, btc.TEST_NETWORK);
+      psbt = tx.toPSBT();
+    } finally {
+      root.wipePrivateData();
+    }
+
+    const { signedInputs } = signBitcoinPsbt(prf, psbt, { network: "testnet" });
+    expect(signedInputs).toBe(1);
   });
 });

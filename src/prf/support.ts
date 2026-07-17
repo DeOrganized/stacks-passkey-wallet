@@ -94,3 +94,44 @@ export function assertPlatformSupportsPrf(info: PlatformInfo = currentPlatformIn
     );
   }
 }
+
+/**
+ * WebAuthn authenticator-data flag: Backup Eligibility (BE), bit 3 of the flags
+ * byte (W3C WebAuthn §6.1). When set, the credential is eligible to be backed up
+ * and synced across the user's devices (iCloud Keychain, Google Password
+ * Manager). When clear, the credential is DEVICE-BOUND (Windows Hello, most
+ * security keys) — a wallet derived from it exists on one device only and cannot
+ * be restored via synced-passkey behavior.
+ */
+export const BACKUP_ELIGIBLE_FLAG = 0x08;
+
+/**
+ * Read the flags byte from authenticator data. It sits at a fixed offset — right
+ * after the 32-byte RP ID hash — in both the attestation authData
+ * (AuthenticatorAttestationResponse.getAuthenticatorData(), create) and the
+ * assertion authData (AuthenticatorAssertionResponse.authenticatorData, get).
+ *
+ * Throws `device-bound-authenticator` if the data is too short to contain the
+ * flags byte: an unreadable credential cannot be certified as syncable, so it is
+ * rejected conservatively (a wallet must never be built on an unverifiable one).
+ */
+export function authenticatorDataFlags(authData: Uint8Array): number {
+  // 32-byte rpIdHash + 1 flags byte → at least 33 bytes (real authData is ≥ 37).
+  if (authData.length < 33) {
+    throw new PrfUnsupportedError(
+      "device-bound-authenticator",
+      "Authenticator data too short to read the backup-eligibility flag.",
+    );
+  }
+  return authData[32]!;
+}
+
+/**
+ * Whether a credential is backup-eligible (a SYNCED passkey) rather than
+ * device-bound. Callers must reject a non-synced credential before deriving a
+ * wallet (spec A1.4) — it would silently produce a single-device, non-restorable
+ * wallet. Pure and unit-testable; pass either the create- or get-time authData.
+ */
+export function isSyncedCredential(authData: Uint8Array): boolean {
+  return (authenticatorDataFlags(authData) & BACKUP_ELIGIBLE_FLAG) !== 0;
+}

@@ -24,7 +24,7 @@ import { DEFAULT_SALT, HKDF_INFO } from "../src/wallet-identity";
 import { prfBytesToMnemonic, prfBytesToRoot } from "../src/derivation/seed";
 import { deriveStacksAccount } from "../src/derivation/stacks";
 import { deriveBitcoinAccount } from "../src/derivation/bitcoin";
-import { BITCOIN_NATIVE_SEGWIT_PATH, STACKS_PATH } from "../src/derivation/paths";
+import { BITCOIN_NATIVE_SEGWIT_PATH, STACKS_PATH, bitcoinNativeSegwitPath } from "../src/derivation/paths";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -50,6 +50,7 @@ for (const { name, prf } of INPUTS) {
   const { root } = prfBytesToRoot(prf, DEFAULT_SALT);
   const stacks = deriveStacksAccount(root, "mainnet");
   const btcAccount = deriveBitcoinAccount(root);
+  const btcTestnet = deriveBitcoinAccount(root, "testnet");
 
   // Cross-validate Stacks against @stacks/wallet-sdk (independent derivation).
   const wallet = await generateWallet({ secretKey: mnemonic, password: "" });
@@ -58,7 +59,7 @@ for (const { name, prf } of INPUTS) {
   const refStx = getAddressFromPrivateKey(account.stxPrivateKey, "mainnet");
   assertEq(stacks.address, refStx, `${name} Stacks vs @stacks/wallet-sdk`);
 
-  // Cross-validate Bitcoin P2WPKH encoding against bitcoinjs-lib.
+  // Cross-validate Bitcoin P2WPKH encoding against bitcoinjs-lib (mainnet).
   const btcNode = root.derive(BITCOIN_NATIVE_SEGWIT_PATH);
   const pubkey = btcNode.publicKey;
   if (!pubkey) throw new Error(`${name}: no BTC public key`);
@@ -69,6 +70,19 @@ for (const { name, prf } of INPUTS) {
   if (!refBtc) throw new Error(`${name}: bitcoinjs-lib produced no address`);
   assertEq(btcAccount.address, refBtc, `${name} Bitcoin vs bitcoinjs-lib`);
 
+  // Cross-validate the testnet address: BIP-84 coin type 1' (m/84'/1'/0'/0/0),
+  // encoded for bitcoinjs-lib's testnet — the pair a standard testnet wallet uses.
+  const testnetPath = bitcoinNativeSegwitPath(0, "testnet");
+  const btcTestNode = root.derive(testnetPath);
+  const testPubkey = btcTestNode.publicKey;
+  if (!testPubkey) throw new Error(`${name}: no BTC testnet public key`);
+  const refBtcTestnet = bitcoin.payments.p2wpkh({
+    pubkey: Buffer.from(testPubkey),
+    network: bitcoin.networks.testnet,
+  }).address;
+  if (!refBtcTestnet) throw new Error(`${name}: bitcoinjs-lib produced no testnet address`);
+  assertEq(btcTestnet.address, refBtcTestnet, `${name} Bitcoin testnet vs bitcoinjs-lib`);
+
   root.wipePrivateData();
 
   vectors.push({
@@ -78,8 +92,11 @@ for (const { name, prf } of INPUTS) {
     mnemonic,
     stacks: { path: STACKS_PATH, address: stacks.address },
     bitcoin: { path: BITCOIN_NATIVE_SEGWIT_PATH, address: btcAccount.address },
+    bitcoin_testnet: { path: testnetPath, address: btcTestnet.address },
   });
-  console.log(`OK ${name}: STX ${stacks.address} | BTC ${btcAccount.address}`);
+  console.log(
+    `OK ${name}: STX ${stacks.address} | BTC ${btcAccount.address} | tBTC ${btcTestnet.address}`,
+  );
 }
 
 const output = {

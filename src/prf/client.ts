@@ -13,7 +13,7 @@ import {
   type CreateOptionsInput,
   type GetOptionsInput,
 } from "./options";
-import { assertPlatformSupportsPrf } from "./support";
+import { assertPlatformSupportsPrf, isSyncedCredential } from "./support";
 
 /**
  * Thin async wrappers over navigator.credentials. Ground-truth PRF support is a
@@ -27,7 +27,12 @@ function requireWebAuthn(): void {
   }
 }
 
-/** Create a passkey with the PRF extension requested. Throws if PRF isn't enabled. */
+/**
+ * Create a passkey with the PRF extension requested. Throws `PrfUnsupportedError`
+ * if PRF isn't enabled, or if the authenticator is device-bound (not backup-
+ * eligible) — a device-bound wallet is single-device and non-restorable, so it is
+ * rejected here, before any derivation, rather than only steered against in UX.
+ */
 export async function createPasskey(input: CreateOptionsInput): Promise<PublicKeyCredential> {
   assertPlatformSupportsPrf();
   requireWebAuthn();
@@ -41,6 +46,21 @@ export async function createPasskey(input: CreateOptionsInput): Promise<PublicKe
   const prf = getPrfOutput(credential.getClientExtensionResults());
   if (!prf) throw new PrfUnsupportedError("prf-not-processed");
   if (prf.enabled !== true) throw new PrfUnsupportedError("prf-not-enabled");
+
+  // Reject device-bound authenticators via the Backup Eligibility flag in the
+  // attestation authenticator data. `getAuthenticatorData()` is baseline in every
+  // PRF-capable browser; if it's somehow unavailable we cannot certify the
+  // credential is syncable, so we reject conservatively.
+  const response = credential.response as unknown as { getAuthenticatorData?: () => ArrayBuffer };
+  if (typeof response.getAuthenticatorData !== "function") {
+    throw new PrfUnsupportedError(
+      "device-bound-authenticator",
+      "Cannot read authenticator data to confirm a synced (backup-eligible) credential.",
+    );
+  }
+  if (!isSyncedCredential(new Uint8Array(response.getAuthenticatorData()))) {
+    throw new PrfUnsupportedError("device-bound-authenticator");
+  }
   return credential;
 }
 
