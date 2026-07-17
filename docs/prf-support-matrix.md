@@ -5,6 +5,11 @@ hardening. A passkey wallet needs **byte-identical PRF output across all of a
 user's synced devices** — that is the axis that matters here, not just "does PRF
 run."
 
+> **Verified-by-hand results** live in the companion
+> [`prf-verification-checklist.md`](./prf-verification-checklist.md). This file records
+> capability per spec and provider docs; that file records what has actually been
+> confirmed end-to-end on real devices.
+
 ## Browser engine — does `getClientExtensionResults().prf.results` return bytes?
 
 | Engine | PRF | Since |

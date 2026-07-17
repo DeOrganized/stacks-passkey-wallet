@@ -38,6 +38,16 @@ malware at that moment could steal it. The passkey improves the *experience*
 (no seed at signup, phishing-resistant login) — it does **not** change the
 underlying trust model.
 
+**Your passkey provider is part of the trust boundary.** Because the wallet's
+keys are derived from PRF output — the passkey *is* the key material, it doesn't
+merely sign an assertion the chain verifies — and passkeys sync through iCloud
+Keychain or Google Password Manager, **whoever can restore your Apple ID or
+Google account can re-derive your funds.** In practice the provider custodies
+the wallet. This is a different trust model from architectures where the passkey
+only signs and the provider never holds spendable key material. Treat the
+account-recovery security of your passkey provider (strong password, 2FA on the
+Apple/Google account, recovery contacts) as part of securing this wallet.
+
 Appropriate for onboarding and casual/moderate balances. **Not for treasuries.**
 
 The library never persists anything key-related: the seed is re-derived on
