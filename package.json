@@ -1,6 +1,6 @@
 {
   "name": "stacks-passkey-wallet",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Passkey-derived wallet reference implementation for Stacks and Bitcoin — WebAuthn PRF → deterministic HD wallet",
   "type": "module",
   "license": "MIT",

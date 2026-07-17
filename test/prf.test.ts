@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  BACKUP_ELIGIBLE_FLAG,
   assertPlatformSupportsPrf,
+  authenticatorDataFlags,
   isIosBelowPrfFloor,
+  isSyncedCredential,
   isWindows,
   parseApplePlatformVersion,
   providerGuidance,
@@ -146,5 +149,40 @@ describe("PRF result parsing (failure shapes → typed errors)", () => {
     expect(readPrfEnabled({ prf: { enabled: true } })).toBe(true);
     expect(readPrfEnabled({ prf: { enabled: false } })).toBe(false);
     expect(readPrfEnabled({})).toBe(false);
+  });
+});
+
+describe("device-bound detection (backup-eligibility flag)", () => {
+  // Minimal authenticator data: 32-byte rpIdHash + flags byte + 4-byte signCount.
+  const authData = (flags: number): Uint8Array => {
+    const bytes = new Uint8Array(37);
+    bytes[32] = flags;
+    return bytes;
+  };
+  const UP = 0x01;
+  const UV = 0x04;
+
+  it("reads the flags byte at the fixed offset (after the 32-byte rpIdHash)", () => {
+    expect(authenticatorDataFlags(authData(UP | UV | BACKUP_ELIGIBLE_FLAG))).toBe(
+      UP | UV | BACKUP_ELIGIBLE_FLAG,
+    );
+  });
+
+  it("treats a backup-eligible credential as synced", () => {
+    expect(isSyncedCredential(authData(UP | UV | BACKUP_ELIGIBLE_FLAG))).toBe(true);
+  });
+
+  it("treats a credential without the BE flag as device-bound", () => {
+    expect(isSyncedCredential(authData(UP | UV))).toBe(false);
+  });
+
+  it("rejects authenticator data too short to hold the flags byte", () => {
+    try {
+      isSyncedCredential(new Uint8Array(10));
+      throw new Error("expected throw");
+    } catch (e) {
+      expect(e).toBeInstanceOf(PrfUnsupportedError);
+      expect((e as PrfUnsupportedError).reason).toBe("device-bound-authenticator");
+    }
   });
 });

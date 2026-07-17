@@ -30,13 +30,17 @@ describe("locked derivation vectors", () => {
       const { root } = prfBytesToRoot(prf, v.salt);
       expect(deriveStacksAccount(root, "mainnet").address).toBe(v.stacks.address);
       expect(deriveBitcoinAccount(root).address).toBe(v.bitcoin.address);
+
+      const testnet = deriveBitcoinAccount(root, "testnet");
+      expect(testnet.path).toBe(v.bitcoin_testnet.path);
+      expect(testnet.address).toBe(v.bitcoin_testnet.address);
     });
   }
 });
 
 describe("independent cross-validation (live)", () => {
   for (const v of locked.vectors) {
-    it(`${v.name}: STX == @stacks/wallet-sdk, BTC == bitcoinjs-lib`, async () => {
+    it(`${v.name}: STX == @stacks/wallet-sdk, BTC (main+test) == bitcoinjs-lib`, async () => {
       const prf = hexToBytes(v.prfBytesHex);
       const { root } = prfBytesToRoot(prf, v.salt);
 
@@ -50,8 +54,48 @@ describe("independent cross-validation (live)", () => {
         network: bitcoin.networks.bitcoin,
       }).address;
       expect(deriveBitcoinAccount(root).address).toBe(refBtc);
+
+      // Testnet: BIP-84 coin type 1' key, encoded for bitcoinjs-lib testnet.
+      const testNode = root.derive(v.bitcoin_testnet.path);
+      const refBtcTestnet = bitcoin.payments.p2wpkh({
+        pubkey: Buffer.from(testNode.publicKey!),
+        network: bitcoin.networks.testnet,
+      }).address;
+      expect(deriveBitcoinAccount(root, "testnet").address).toBe(refBtcTestnet);
     });
   }
+});
+
+describe("testnet Bitcoin uses BIP-84 coin type 1' (regression: was 0')", () => {
+  const prf = hexToBytes(locked.vectors[0].prfBytesHex);
+
+  it("deriveBitcoinAccount(testnet) derives at m/84'/1'/0'/0/0 and encodes tb1", () => {
+    const { root } = prfBytesToRoot(prf, DEFAULT_SALT);
+    const acct = deriveBitcoinAccount(root, "testnet");
+    expect(acct.path).toBe("m/84'/1'/0'/0/0");
+    expect(acct.address.startsWith("tb1")).toBe(true);
+  });
+
+  it("deriveAddresses({network:'testnet'}) reports the 1' path", () => {
+    expect(deriveAddresses(prf, { network: "testnet" }).bitcoin.path).toBe("m/84'/1'/0'/0/0");
+  });
+
+  it("testnet address comes from the 1' key, NOT the old mainnet-path key", () => {
+    const { root } = prfBytesToRoot(prf, DEFAULT_SALT);
+    // The bug: testnet encoder over the mainnet (0') path key.
+    const buggy = bitcoin.payments.p2wpkh({
+      pubkey: Buffer.from(root.derive("m/84'/0'/0'/0/0").publicKey!),
+      network: bitcoin.networks.testnet,
+    }).address;
+    const fixed = deriveBitcoinAccount(root, "testnet").address;
+    expect(fixed).not.toBe(buggy);
+    // ...and it matches the correct 1'-path key.
+    const correct = bitcoin.payments.p2wpkh({
+      pubkey: Buffer.from(root.derive("m/84'/1'/0'/0/0").publicKey!),
+      network: bitcoin.networks.testnet,
+    }).address;
+    expect(fixed).toBe(correct);
+  });
 });
 
 describe("golden external anchor (BIP-84 published test vector)", () => {

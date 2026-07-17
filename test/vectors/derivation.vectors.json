@@ -24,6 +24,10 @@
       "bitcoin": {
         "path": "m/84'/0'/0'/0/0",
         "address": "bc1qjyexgupjwsfy3uuxec724salu4ax24pemyxzh7"
+      },
+      "bitcoin_testnet": {
+        "path": "m/84'/1'/0'/0/0",
+        "address": "tb1qr0z23k60cstq9ew3d42k9vn8g0laqdsum6u8ap"
       }
     },
     {
@@ -38,6 +42,10 @@
       "bitcoin": {
         "path": "m/84'/0'/0'/0/0",
         "address": "bc1q5rxm5xfvkkk6jjwcj9frg793c7an4r0nveyet9"
+      },
+      "bitcoin_testnet": {
+        "path": "m/84'/1'/0'/0/0",
+        "address": "tb1qhd0kazgqljwnvwthk4c9ypy4qs7gpp6r63a8nl"
       }
     },
     {
@@ -52,6 +60,10 @@
       "bitcoin": {
         "path": "m/84'/0'/0'/0/0",
         "address": "bc1qcgendxv6rmfzzzd352vrddl8dgez4j7xv7cudj"
+      },
+      "bitcoin_testnet": {
+        "path": "m/84'/1'/0'/0/0",
+        "address": "tb1qq5mfurvyxj0pggw72npf64xfsc488s5qgen6fc"
       }
     },
     {
@@ -66,6 +78,10 @@
       "bitcoin": {
         "path": "m/84'/0'/0'/0/0",
         "address": "bc1qaap04trkz6qtghsrsg2dq872k35vk0up7y6sjl"
+      },
+      "bitcoin_testnet": {
+        "path": "m/84'/1'/0'/0/0",
+        "address": "tb1qa6ugfpsgp6l8q6xlxuk86g636e28er9jc6g5c6"
       }
     }
   ]

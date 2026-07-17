@@ -1,5 +1,3 @@
-import * as btc from "@scure/btc-signer";
-
 import { DEFAULT_SALT } from "../wallet-identity";
 import { prfBytesToRoot } from "./seed";
 import { deriveStacksAccount, type StacksAccount, type StacksNetwork } from "./stacks";
@@ -31,14 +29,13 @@ export function deriveAddresses(
   options: DeriveAddressesOptions = {},
 ): DerivedAddresses {
   const salt = options.salt ?? DEFAULT_SALT;
-  const stacksNetwork: StacksNetwork = options.network ?? "mainnet";
-  const btcNetwork = stacksNetwork === "testnet" ? btc.TEST_NETWORK : btc.NETWORK;
+  const network: StacksNetwork = options.network ?? "mainnet";
 
   const { root } = prfBytesToRoot(prfBytes, salt);
   try {
     return {
-      stacks: deriveStacksAccount(root, stacksNetwork),
-      bitcoin: deriveBitcoinAccount(root, btcNetwork),
+      stacks: deriveStacksAccount(root, network),
+      bitcoin: deriveBitcoinAccount(root, network),
     };
   } finally {
     root.wipePrivateData();
