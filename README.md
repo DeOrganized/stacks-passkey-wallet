@@ -69,6 +69,12 @@ derives a **different, empty wallet** — not access to your original. Always ba
 up the seed phrase for recovery. The library exposes
 `WALLET_ACTIONS` so host apps keep this language straight.
 
+This pitfall has a subtle integration counterpart: a failed sign-in `get()`
+cannot be told apart from a user cancellation, so auto-creating on failure
+silently mints a duplicate empty wallet. See
+[docs/get-vs-create-ambiguity.md](docs/get-vs-create-ambiguity.md) for the
+`get()`-first / confirm-before-`create()` pattern that avoids it.
+
 ## Supported platforms
 
 Reliable, byte-identical PRF across a user's synced devices exists on two
