@@ -39,6 +39,14 @@ const { stacks, bitcoin } = await deriveAddressesFromPasskey({ challenge, rpId }
 No "wallet", "seed", or "chain" wording at signup. The wallet is invisible; a
 dashboard wallet-home surface is where you later reveal it.
 
+**Returning users are a `get()`, not a `create()`.** Sign-in re-derives the same
+wallet via `deriveAddressesFromPasskey` (a `get()`); only genuinely new users
+should reach `createPasskey`. A failed `get()` cannot tell "no passkey on this
+device" from "user cancelled," so never auto-fall-through from one to the other —
+see [get-vs-create-ambiguity.md](./get-vs-create-ambiguity.md) for why, and the
+`get()`-first / confirm-before-`create()` pattern that avoids silently minting a
+duplicate empty wallet.
+
 ## 3. Signing
 
 ```ts
