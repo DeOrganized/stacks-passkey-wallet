@@ -139,6 +139,29 @@ The load-bearing choices:
   (retry the `get()`) should be the easy one and the irreversible action
   (`create()`) the deliberate one.
 
+## Platform note: `create()` may surface an existing passkey first
+
+On Android with Google Password Manager, if the platform already holds a passkey
+for this relying party, a `create()` ceremony can *foreground the existing
+credential* — offering to use it — instead of going straight to "create a new
+passkey." The new-credential option is still reachable, but the user has to back
+out of the surfaced existing-credential prompt to get to it.
+
+Two consequences for the confirm-then-`create()` path above:
+
+- A user who explicitly chose "create a new wallet" may still land on a screen
+  showing their *existing* passkey. Worth a line of in-context guidance — "if you
+  see an existing passkey, go back to reach the create-new option" — so the
+  surfaced credential isn't mistaken for a dead end.
+- `create()` is not guaranteed to bypass existing credentials. The credential
+  picker belongs to the platform authenticator, not to this library (the create
+  options here only request the PRF extension); the library cannot suppress or
+  reorder what the authenticator chooses to show.
+
+This is authenticator/platform UX, so it varies by provider and OS version;
+treat the Android/GPM behavior above as the case to design copy around, not a
+guarantee of what every authenticator does.
+
 ## Future direction: conditional mediation sidesteps the ambiguity
 
 The ambiguity exists because a *modal* `get()` must resolve to either an
