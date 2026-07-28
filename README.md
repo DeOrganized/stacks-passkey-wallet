@@ -4,7 +4,8 @@
 > cross-device PRF support matrix is **incomplete** (see
 > [`docs/prf-support-matrix.md`](docs/prf-support-matrix.md)). Adopters inherit
 > these caveats: pin an exact version, and verify on your target passkey
-> providers before relying on it for funds.
+> providers before relying on it for funds. Breaking changes between pre-1.0
+> versions are listed in [CHANGELOG.md](CHANGELOG.md) — read it before upgrading.
 
 Passkey-derived wallet reference implementation for Stacks and Bitcoin —
 WebAuthn PRF → deterministic HD wallet. **MIT licensed. Clean-room** from the
