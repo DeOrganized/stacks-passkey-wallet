@@ -1,6 +1,6 @@
 # stacks-passkey-wallet
 
-> ⚠️ **Pre-release — v0.1.0.** Production hardening is in progress and the
+> ⚠️ **Pre-release — v0.2.0.** Production hardening is in progress and the
 > cross-device PRF support matrix is **incomplete** (see
 > [`docs/prf-support-matrix.md`](docs/prf-support-matrix.md)). Adopters inherit
 > these caveats: pin an exact version, and verify on your target passkey
