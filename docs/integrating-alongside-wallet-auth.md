@@ -51,8 +51,8 @@ calls:
 ```text
 async function signInWithWallet():
     address = await connect()          # promise-based connect returns/exposes the
-                                        # address synchronously once it resolves —
-                                        # no reactive hop needed to read it
+                                       # address synchronously once it resolves —
+                                       # no reactive hop needed to read it
     signature = await sign(challenge(address))
     session   = await verifyOnServer(address, signature)   # mint + store token
     return { ok: true, isNew: session.isNew }
