@@ -18,15 +18,6 @@ Documentation and packaging only — no library behavior has changed since 0.2.0
 
 ### Added
 
-- `docs/get-vs-create-ambiguity.md` — why a failed sign-in `get()` cannot be told
-  apart from a user cancellation, and the `get()`-first / confirm-before-`create()`
-  pattern that avoids silently minting a duplicate empty wallet. Includes a
-  platform note on Android/Google Password Manager surfacing an existing passkey
-  during a `create()` ceremony.
-- `docs/integrating-alongside-wallet-auth.md` — patterns for adding a
-  passkey-derived wallet next to an existing wallet-extension or email sign-in.
-- `docs/prf-verification-checklist.md` — the manual cross-device PRF verification
-  procedure, and a table for recording confirmed device pairs.
 - Passkey-provider custody documented in the README trust model: because the
   wallet keys are derived from PRF output, whoever can restore the user's Apple
   or Google account can re-derive the wallet.
