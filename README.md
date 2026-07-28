@@ -139,7 +139,10 @@ console.log(seed.reveal()); // the 24-word phrase, once
 ```
 
 See the [integration guide](docs/integration.md) for the full host-app flow and
-[the demo](demo/) for a runnable standalone example (`npm run demo`).
+[the demo](demo/) for a runnable standalone example (`npm run demo`). If your app
+already has a wallet-extension or email sign-in, see
+[docs/integrating-alongside-wallet-auth.md](docs/integrating-alongside-wallet-auth.md)
+for the patterns that keep all three methods coherent behind one entry point.
 
 ## Development
 

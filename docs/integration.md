@@ -47,6 +47,12 @@ see [get-vs-create-ambiguity.md](./get-vs-create-ambiguity.md) for why, and the
 `get()`-first / confirm-before-`create()` pattern that avoids silently minting a
 duplicate empty wallet.
 
+**Adding this next to an existing sign-in.** If the app already authenticates
+with a wallet extension or email, the passkey method has to share their session,
+onboarding, and auth-dependent UI rather than run beside them — see
+[integrating-alongside-wallet-auth.md](./integrating-alongside-wallet-auth.md)
+for the patterns that keep the methods coherent behind one entry point.
+
 ## 3. Signing
 
 ```ts
