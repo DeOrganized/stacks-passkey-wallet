@@ -158,6 +158,13 @@ Two consequences for the confirm-then-`create()` path above:
   options here only request the PRF extension); the library cannot suppress or
   reorder what the authenticator chooses to show.
 
+`excludeCredentials` is the natural thing to reach for here, and it solves a
+different problem: per the WebAuthn spec, listing an already-present credential
+makes the authenticator *refuse* the ceremony with an `InvalidStateError` rather
+than show a better picker. That is a guard against accidental duplicates — not a
+way to steer a user who has deliberately confirmed they want a second wallet to
+the create-new option.
+
 This is authenticator/platform UX, so it varies by provider and OS version;
 treat the Android/GPM behavior above as the case to design copy around, not a
 guarantee of what every authenticator does.
