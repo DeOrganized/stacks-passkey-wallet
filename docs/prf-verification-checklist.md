@@ -48,6 +48,13 @@ Run this for each provider/OS/browser combination you want to claim as verified.
 _(Add one row per verified pair. Leave the placeholder rows until the first real
 result replaces them.)_
 
+**Single-device re-derivation (not an A↔B sync check):** iCloud Keychain, iPhone /
+Safari (iOS version unrecorded) — a passkey created in late July 2026 re-derived the
+same wallet intact via a fresh `get()` roughly one week later on the same device,
+across a sign-out / sign-in cycle. This confirms the create → later-`get()`
+persistence path on one device; the cross-device byte-identical sync in the table
+above still awaits a real device pair.
+
 ## Combos to cover (priority order)
 
 Target the two launch-supported providers first, then breadth. Contributors with
@@ -73,4 +80,4 @@ lives in `prf-support-matrix.md`.
 
 ---
 
-_Last updated: 2026-07-17 · Update in place as combos are verified._
+_Last updated: 2026-07-30 · Update in place as combos are verified._
