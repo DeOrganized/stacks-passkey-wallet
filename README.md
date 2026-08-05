@@ -50,6 +50,8 @@ account-recovery security of your passkey provider (strong password, 2FA on the
 Apple/Google account, recovery contacts) as part of securing this wallet.
 
 Appropriate for onboarding and casual/moderate balances. **Not for treasuries.**
+Full guidance for users and integrators:
+[docs/securing-your-funds.md](docs/securing-your-funds.md).
 
 The library never persists anything key-related: the seed is re-derived on
 demand, lives only in page memory, and is zeroized after use. Nothing touches
@@ -91,6 +93,39 @@ providers today:
 The iOS 18.4 floor is enforced as a **hard runtime check** (earlier versions can
 derive inconsistent bytes across devices). Full detail:
 [docs/prf-support-matrix.md](docs/prf-support-matrix.md).
+
+## Status & roadmap
+
+**Production-verified** — running on deorganized.com, confirmed end-to-end on
+real devices.
+
+| | |
+|---|---|
+| Passkey signup → wallet in one tap | ✅ live |
+| Stacks + Bitcoin address derivation | ✅ live, vectors cross-validated |
+| Stacks message signing (RSV) | ✅ live |
+| Bitcoin PSBT signing | ✅ live |
+| Seed-phrase export + independent restore | ✅ verified in Xverse |
+| iCloud Keychain (iOS 18.4+ / macOS 15.4+) | ✅ create + re-derive confirmed |
+| Google Password Manager (desktop + Android) | ✅ create + re-derive confirmed |
+
+**In development**
+
+| | |
+|---|---|
+| `signStacksTransaction` — contract calls & token transfers | tracked in [issue #1](https://github.com/DeOrganized/stacks-passkey-wallet/issues/1) (pt 3). Message signing and PSBT signing exist today; transaction signing does not. |
+| Cross-device / cross-provider PRF matrix | partially verified by hand — [`prf-support-matrix.md`](docs/prf-support-matrix.md) |
+| Automated browser-mode PRF tests | not yet automated; the manual [checklist](docs/prf-verification-checklist.md) is the current instrument |
+
+**Roadmap** — not started, no timeline committed.
+
+| | |
+|---|---|
+| EVM address derivation | — |
+| Solana address derivation | — |
+
+Before holding funds on this, read
+[docs/securing-your-funds.md](docs/securing-your-funds.md).
 
 ## Install
 
@@ -161,5 +196,6 @@ Test vectors are cross-validated against `@stacks/wallet-sdk` (Stacks) and
 
 ## License & credits
 
-MIT © DeOrganized. Built as the open reference deliverable for a DeGrants
-Milestone 1. Contributions welcome under MIT.
+MIT © DeOrganized. Built as open infrastructure for deorganized.com's one-tap
+accounts; development supported by a Stacks Endowment grant. Contributions
+welcome under MIT.
