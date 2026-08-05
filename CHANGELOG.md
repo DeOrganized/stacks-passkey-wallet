@@ -18,27 +18,23 @@ Documentation and packaging only — no library behavior has changed since 0.2.0
 
 ### Added
 
+- `docs/securing-your-funds.md` — funds-security guidance for both end users and
+  integrators: hot-wallet trust model, passkey-provider custody, the
+  add-a-passkey vs restore-my-wallet distinction, the seed-export ceremony,
+  provider-sync caveats, and what the library never stores.
+- README **Status & roadmap** section — production-verified / in-development /
+  roadmap, so adopters can see what is proven versus planned without reading the
+  issue tracker.
 - Passkey-provider custody documented in the README trust model: because the
   wallet keys are derived from PRF output, whoever can restore the user's Apple
   or Google account can re-derive the wallet.
 
 ## [0.2.0] - 2026-07-17
 
-Two fixes from an independent security review of the derivation and PRF core.
-**Mainnet derivation is byte-for-byte unchanged** — the frozen mainnet vectors
-were not touched, so existing mainnet wallets re-derive identically.
-
-### Security
-
-- `createPasskey()` now **rejects device-bound authenticators** (Windows Hello,
-  most hardware security keys) before any key derivation, by checking the Backup
-  Eligibility flag in the attestation authenticator data. Previously these were
-  only steered against in guidance copy, so a wallet could still be derived from
-  a credential that exists on a single device and cannot be restored through
-  synced-passkey behavior. Rejection raises the existing
-  `PrfUnsupportedError("device-bound-authenticator")`. If the authenticator data
-  cannot be read at all, the credential is rejected conservatively rather than
-  assumed syncable.
+Two fixes from an independent security review of the derivation and PRF core: a
+testnet Bitcoin derivation-path correction and a device-bound-authenticator
+gate. **Mainnet derivation is byte-for-byte unchanged** — the frozen mainnet
+vectors were not touched, so existing mainnet wallets re-derive identically.
 
 ### Fixed
 
@@ -54,6 +50,18 @@ were not touched, so existing mainnet wallets re-derive identically.
   differs from the one 0.2.0 produces for the same passkey; testnet funds held
   at a 0.1.0-derived address are reachable only via the old
   `m/84'/0'/0'/0/0` path. Mainnet is unaffected.
+
+### Security
+
+- `createPasskey()` now **rejects device-bound authenticators** (Windows Hello,
+  most hardware security keys) before any key derivation, by checking the Backup
+  Eligibility flag in the attestation authenticator data. Previously these were
+  only steered against in guidance copy, so a wallet could still be derived from
+  a credential that exists on a single device and cannot be restored through
+  synced-passkey behavior. Rejection raises the existing
+  `PrfUnsupportedError("device-bound-authenticator")`. If the authenticator data
+  cannot be read at all, the credential is rejected conservatively rather than
+  assumed syncable.
 
 ### Changed
 
