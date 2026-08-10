@@ -46,6 +46,15 @@ Paths are defined in [`src/derivation/paths.ts`](../src/derivation/paths.ts) and
 verified (M1 diagnosis, V1) as byte-identical to Leather's and Xverse's account-0
 defaults.
 
+**Scope.** What is frozen is the mapping above: the constants, and the account-0 path
+for each chain. Deriving at any *other* path in the same tree is an **addition, not a
+change** — account-0 derivation stays byte-identical and no existing address moves.
+Only a change to what account 0 derives is a wallet-universe break, governed by the
+change policy below. Any such addition must state which multi-account indexing
+convention it follows, because the wallets diverge — Leather-software increments the
+final index, while Xverse and Leather-on-Ledger increment the `account'` field — and
+leaving it unstated hands adopters an interoperability footgun.
+
 ## Networks
 
 The two chains handle networks differently, and the asymmetry is part of the frozen
