@@ -139,6 +139,43 @@ The load-bearing choices:
   (retry the `get()`) should be the easy one and the irreversible action
   (`create()`) the deliberate one.
 
+### Checking backup-eligibility on the `get()` path
+
+One unambiguous-unsuitable case deserves its own note, because the library does
+not yet catch it for you. `createPasskey()` rejects device-bound authenticators
+(Windows Hello, most security keys) by reading the Backup Eligibility flag — a
+device-bound credential derives a single-device wallet that cannot be restored.
+The `get()`-path calls — `evaluatePrf()`, `deriveAddressesFromPasskey()`, and
+`exportSeedPhrase()` — apply **no** such gate today, which matters when
+re-deriving a credential that was created outside this library. Closing that gap
+is tracked in
+[#13](https://github.com/DeOrganized/stacks-passkey-wallet/issues/13).
+
+Until it ships, check host-side with the same helper the library uses:
+
+```ts
+import { isSyncedCredential } from "stacks-passkey-wallet";
+
+const assertion = await navigator.credentials.get({ publicKey });
+if (!isSyncedCredential(new Uint8Array(assertion.response.authenticatorData))) {
+  // UNAMBIGUOUS — unsuitable credential, not an ambiguous ceremony failure.
+  // Route it like the other unsupported-environment cases; never auto-create().
+  return routeToFallback("device-bound");
+}
+```
+
+> ⚠️ **Wrap it.** `assertion.response.authenticatorData` is an `ArrayBuffer`,
+> while `isSyncedCredential` takes a `Uint8Array`. Passing the buffer directly
+> fails silently rather than loudly: the length guard reads `undefined`, the
+> flags byte reads `undefined`, and the function returns `false` for *every*
+> credential — rejecting perfectly good synced passkeys. Always construct the
+> `new Uint8Array(...)` as above.
+
+A device-bound credential belongs in the **unambiguous** class from the pattern
+above: the user has a real credential, it is simply unusable as a wallet, so
+routing to a fallback strands nothing. It must not reach the confirm-and-create
+branch.
+
 ## Platform note: `create()` may surface an existing passkey first
 
 On Android with Google Password Manager, if the platform already holds a passkey
