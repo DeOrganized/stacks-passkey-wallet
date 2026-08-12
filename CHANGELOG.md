@@ -8,6 +8,13 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 **Pre-1.0 caveat:** while the library is below 1.0, breaking changes may land in
 minor versions. Pin an exact version and read this file before upgrading.
 
+## [0.2.2] - 2026-08-12
+
+### Changed
+
+- Documentation only — removes a credits line from the README. No library
+  behavior has changed since 0.2.1.
+
 ## [0.2.1] - 2026-08-10
 
 Documentation and packaging only — no library behavior has changed since 0.2.0.
@@ -135,7 +142,8 @@ Initial release — the Milestone-1 reference library (Part A).
 - Standalone browser demo and the initial documentation set (setup, integration
   guide, PRF support matrix).
 
-[Unreleased]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.1...main
+[Unreleased]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.2...main
+[0.2.2]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/DeOrganized/stacks-passkey-wallet/commits/v0.1.0
