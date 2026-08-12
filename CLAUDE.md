@@ -3,10 +3,9 @@
 This repository is PUBLIC. Its entire git history — every commit, from the
 first one — is permanently world-readable. Write accordingly.
 
-Development of this library is supported by a Stacks Endowment grant. That is a
-funding fact, not the repo's identity: this is a general-purpose MIT reference
-library for anyone building passkey-derived wallets on Stacks and Bitcoin, and
-it should read that way throughout.
+This is a general-purpose MIT reference library for anyone building
+passkey-derived wallets on Stacks and Bitcoin, and it should read that way
+throughout.
 
 ## Hard rules
 

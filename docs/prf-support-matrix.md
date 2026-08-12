@@ -1,6 +1,6 @@
 # WebAuthn PRF support matrix (living doc)
 
-Seeded from the Milestone-1 diagnosis (V4, 2026-07-14); completed during M2
+Seeded from the initial PRF diagnosis (V4, 2026-07-14); completed during later
 hardening. A passkey wallet needs **byte-identical PRF output across all of a
 user's synced devices** — that is the axis that matters here, not just "does PRF
 run."
