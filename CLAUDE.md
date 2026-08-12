@@ -36,3 +36,12 @@ DeOrganized is this library's test bed, not its subject.
   items are diagnosis tasks, not build tasks.
 - Feature branches for exploration; main receives coherent, reviewed merges.
 - Code blocks in reports contain only file contents; commentary goes outside.
+
+## Publishing
+
+- Pre-publish (Windows/OneDrive): pause OneDrive syncing before `npm publish` or
+  any build that cleans `dist/` — the prepare/prepublishOnly double-build
+  collides with OneDrive file locks (EBUSY on dist files). Resume after.
+- A stale npm login surfaces as E404 "not found" on PUT, not 401 — re-login
+  (browser + security key; no OTP path on this account) before diagnosing
+  further.
