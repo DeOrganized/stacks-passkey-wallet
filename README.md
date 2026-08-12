@@ -197,5 +197,4 @@ Test vectors are cross-validated against `@stacks/wallet-sdk` (Stacks) and
 ## License & credits
 
 MIT © DeOrganized. Built as open infrastructure for deorganized.com's one-tap
-accounts; development supported by a Stacks Endowment grant. Contributions
-welcome under MIT.
+accounts. Contributions welcome under MIT.
