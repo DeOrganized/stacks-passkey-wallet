@@ -18,7 +18,8 @@ import { assertPlatformSupportsPrf, isSyncedCredential } from "./support";
 /**
  * Thin async wrappers over navigator.credentials. Ground-truth PRF support is a
  * real get() that returns bytes; the pure builders/readers/detectors carry the
- * unit-testable logic. End-to-end PRF behavior is covered by M2 browser tests.
+ * unit-testable logic. End-to-end PRF behavior is covered by browser tests
+ * (planned).
  */
 
 function requireWebAuthn(): void {

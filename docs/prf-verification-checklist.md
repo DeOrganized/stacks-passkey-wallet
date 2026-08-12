@@ -5,7 +5,7 @@ what *should* work per spec and provider docs; this file records what has actual
 been **verified by hand, end to end**, on real devices.
 
 The load-bearing assumption of the whole design is **byte-identical PRF output
-across a user's synced devices**. Until the M2 browser tests automate this, the
+across a user's synced devices**. Until automated browser tests cover this, the
 table below is the only ground-truth record adopters can trust. If a combo is not
 in the "Verified" table, treat it as unverified — not as broken, and not as known-good.
 
