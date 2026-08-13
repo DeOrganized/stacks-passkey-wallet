@@ -48,12 +48,25 @@ Run this for each provider/OS/browser combination you want to claim as verified.
 _(Add one row per verified pair. Leave the placeholder rows until the first real
 result replaces them.)_
 
-**Single-device re-derivation (not an A↔B sync check):** iCloud Keychain, iPhone /
-Safari (iOS version unrecorded) — a passkey created in late July 2026 re-derived the
-same wallet intact via a fresh `get()` roughly one week later on the same device,
-across a sign-out / sign-in cycle. This confirms the create → later-`get()`
-persistence path on one device; the cross-device byte-identical sync in the table
-above still awaits a real device pair.
+## Single-device re-derivation (not A↔B sync checks)
+
+| # | Provider | Device (OS / browser) | UV modality | Create → derive | Re-derive after sign-out/in | Verified by | Date |
+|---|---|---|---|---|---|---|---|
+| 1 | iCloud Keychain | iPhone / Safari (iOS version unrecorded) | not recorded | ✅ | ✅ (~1 week later) | — | late Jul 2026 |
+| 2 | Google Password Manager | Pixel 6 / Android / Chrome | **pattern** (screen lock); no biometric enrolled — sensor present, physically defeated | ✅ | ✅ | family tester | 2026-08-12 |
+
+These confirm the create → later-`get()` persistence path on a single device, across
+a sign-out / sign-in cycle. The cross-device byte-identical sync in the table above
+still awaits a real device pair.
+
+**Row 2 ceremony notes.** GPM presented a biometric-first UI despite no enrolled
+biometric; the **"Use pattern"** fallback link rendered the pattern grid as the
+actual ceremony, which completed normally. The save dialog read verbatim: *"saved to
+Google Password Manager for [account]. You can use it on other devices, and your
+screen lock will be used to encrypt your data"* — language consistent with a
+**synced (backup-eligible)** credential, though the Backup Eligibility flag itself
+was not read on this run. Run as a controlled comparison against a biometric run on
+identical hardware.
 
 ## Combos to cover (priority order)
 
@@ -80,4 +93,4 @@ lives in `prf-support-matrix.md`.
 
 ---
 
-_Last updated: 2026-07-30 · Update in place as combos are verified._
+_Last updated: 2026-08-12 · Update in place as combos are verified._

@@ -62,6 +62,11 @@ Ground truth is a real `get()` returning `prf.results.first` of 32 bytes.
 - **Dedicated `get()`** for bytes; don't rely on create-time results.
 - **UV consistency:** create and get must use identical `userVerification` (CTAP2
   keeps separate UV/non-UV PRFs). Enforced + tested.
+- **UV is not biometric-specific:** a knowledge-factor screen lock (PIN/pattern)
+  satisfies `userVerification: "required"` — confirmed on GPM/Android with no
+  biometric enrolled. Users who cannot or do not enrol a biometric are not excluded
+  from a passkey wallet. Evidence in
+  [`prf-verification-checklist.md`](./prf-verification-checklist.md).
 
 ## Sources
 
