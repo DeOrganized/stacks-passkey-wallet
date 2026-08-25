@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { hexToBytes } from "@noble/hashes/utils.js";
 
-import { SeedExport, WALLET_ACTIONS, seedExportFromPrfBytes } from "../src/export";
+import { SeedExport, WALLET_ACTIONS, seedExportFromPrfBytes } from "../src/export/seedExport";
 import { BackupNotAcknowledgedError, SeedAlreadyRevealedError } from "../src/errors";
 
 const here = dirname(fileURLToPath(import.meta.url));

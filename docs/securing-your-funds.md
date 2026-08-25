@@ -26,8 +26,11 @@ wallet actually works and what that means for you.
 ## What kind of wallet this is
 
 The wallet's private key is derived from your passkey each time it is needed,
-used, and then discarded. Deriving and signing happen in the web page you are
-using — so at the moment you sign, the key exists in that page's memory.
+used, and then let go of — the library overwrites the key buffers it holds, and
+the derived pieces it hands to the signing code are dropped to the browser's
+garbage collector rather than overwritten (`src/memory.ts` marks that
+boundary). Deriving and signing happen in the web page you are using — so at
+the moment you sign, the key exists in that page's memory.
 
 That has two consequences worth being plain about:
 
@@ -91,11 +94,14 @@ do not merge.
 Your wallet has a standard 24-word BIP-39 recovery phrase. Exporting it is the
 one thing on this page that you should go do now if you have not.
 
-**How the export works.** The app must show you a warning first, and you must
-re-authenticate with your passkey at that moment. The phrase is then displayed
-**once** and forgotten by the app. It is never sent anywhere, never logged, and
-never written to your browser's storage. If you close the screen without writing
-it down, you can run the export again — but each run shows it exactly once.
+**How the export works.** The app confirms to the library that it showed you a
+warning first (`acknowledgedBackupWarning`), and you must re-authenticate with
+your passkey at that moment — the library will not produce the phrase without
+that fresh passkey ceremony. The phrase is then handed to the app **once**; the
+library forgets it immediately and never sends, logs, or stores it. What the app
+does with the phrase after that — display it, clear it, dismiss it — is the
+app's responsibility. If you close the screen without writing it down, you can
+run the export again — but each run produces it exactly once.
 
 **How to store it.**
 
@@ -121,10 +127,10 @@ design rests on. Not every provider or version delivers it.
 
 | Provider | Works for this wallet | Notes |
 |---|---|---|
-| **iCloud Keychain** | Yes, on iOS/iPadOS **18.4+** and macOS **15.4+** | Earlier versions could derive inconsistently across devices. The library refuses to run below the iOS floor rather than risk it. |
+| **iCloud Keychain** | Yes, on iOS/iPadOS **18.4+** and macOS **15.4+** | Earlier versions could derive inconsistently across devices. The library's user-agent check refuses recognized iOS/iPadOS agents below the floor rather than risk it; it is not a capability probe, and agents it does not recognize pass through to WebAuthn's own errors. |
 | **Google Password Manager** | Yes | Chrome/Edge 116+, desktop and Android. On by default; the broadest option, and the recommended one on Windows. |
-| **Windows Hello** | No | The credential never leaves that one PC. Rejected before any key is derived. |
-| **Hardware security keys** | No | Same reason — device-bound. |
+| **Windows Hello** | No | The credential never leaves that one PC. `createPasskey()` rejects it before deriving; the sign-in (`get()`) path applies no such gate today — see [#13](https://github.com/DeOrganized/stacks-passkey-wallet/issues/13) and [`get-vs-create-ambiguity.md`](./get-vs-create-ambiguity.md#checking-backup-eligibility-on-the-get-path). |
+| **Hardware security keys** | No | Same reason — device-bound, and the same create-only gate. |
 | **Firefox on Android, Android WebView** | No | No passkey PRF support. |
 
 Practical caveats:
@@ -145,13 +151,16 @@ Practical caveats:
 The library holds no persistent state at all:
 
 - **No seed, key, or phrase in `localStorage`, `IndexedDB`, cookies, or any
-  other browser storage.** The seed is re-derived on demand, lives only in page
-  memory, and the buffers are zeroized after use.
+  other browser storage.** The seed is re-derived on demand and lives only in
+  page memory. The HD root and the byte buffers the library holds are zeroized
+  after use; derived child keys and string values are released to garbage
+  collection, not overwritten (`src/memory.ts` states that boundary).
 - **Nothing is transmitted.** The library sends no key material to any server —
   not DeOrganized's, not anyone's. There is no telemetry.
-- **The exported phrase is reveal-once** and is redacted from logging and
-  serialization, so it cannot leak through an accidental `console.log` or
-  `JSON.stringify` of the export object.
+- **The exported phrase is reveal-once.** The export object redacts itself on
+  string coercion and `JSON.stringify`, so those accidental paths do not carry
+  the phrase; once `reveal()` has handed it over, handling it is the app's
+  responsibility.
 
 What an app built on the library *will* normally store is your **addresses** —
 which are public information — so it can show your balance. That is expected and
@@ -197,8 +206,9 @@ Everything above is the user-facing contract. Keeping it true is on you.
 **Do not weaken the built-in gates.**
 
 - Seed export requires a fresh `get()` and an explicit
-  `acknowledgedBackupWarning: true`. Set that flag only after the user has
-  actually passed your warning UI — not as a constructor default.
+  `acknowledgedBackupWarning`; this is the only path the library exposes. Set
+  that flag only after the user has actually passed your warning UI — not as a
+  constructor default.
 - `SeedExport.reveal()` yields the phrase once. Do not cache the result, store
   it, or pass it to anything that persists or transmits.
 - `createPasskey()` rejects device-bound authenticators before deriving. Do not

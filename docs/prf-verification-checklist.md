@@ -43,10 +43,10 @@ Run this for each provider/OS/browser combination you want to claim as verified.
 | # | Provider | Device A (OS / browser) | Device B (OS / browser) | STX match | BTC match | PRF-prefix match | Verified by | Date | Notes |
 |---|---|---|---|---|---|---|---|---|---|
 | _ | Google Password Manager | _ | _ | ☐ | ☐ | ☐ | _ | _ | _ |
-| _ | iCloud Keychain | _ | _ | ☐ | ☐ | ☐ | _ | _ | _ |
+| 1 | iCloud Keychain | MacBook / macOS Safari (credential created; OS version unrecorded) | iPhone / Chrome, synced via iCloud Keychain (iOS version unrecorded) | ✅ (same wallet on sign-in) | — not captured | — not captured | organic field result, platform tester | 2026-08-14 | **Field result, not a bench run.** An unprompted real-user cross-device sign-in — laptop-created credential, iCloud sync, sign-in on iPhone Chrome — reported publicly with a screenshot and landing in the same wallet. STX match is inferred from the successful same-wallet sign-in; BTC address and PRF-prefix were not recorded. Closes the Apple-ecosystem combo; the Google combo is still open. |
 
-_(Add one row per verified pair. Leave the placeholder rows until the first real
-result replaces them.)_
+_(Add one row per verified pair. Leave the placeholder row until the first real
+result replaces it.)_
 
 ## Single-device re-derivation (not A↔B sync checks)
 

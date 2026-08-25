@@ -27,7 +27,7 @@ run."
 |---|---|---|---|
 | **iCloud Keychain** | ✅ | ✅ | iOS/iPadOS 18.4+, macOS 15.4+. The 18.0–18.3 hybrid-vs-local mismatch is fixed in 18.4. |
 | **Google Password Manager** | ✅ | ✅ | On by default; broadest and most reliable. |
-| **Windows Hello** | ✅ | ❌ | Device-bound (TPM). Would be a single-device wallet — **not supported for derivation**. |
+| **Windows Hello** | ✅ | ❌ | Device-bound (TPM). Would be a single-device wallet — **`createPasskey()` rejects it before deriving**; the `get()` path applies no gate today ([#13](https://github.com/DeOrganized/stacks-passkey-wallet/issues/13), [`get-vs-create-ambiguity.md`](./get-vs-create-ambiguity.md#checking-backup-eligibility-on-the-get-path)). |
 | **Hardware keys** | ✅ (fw ≥5.2) | ❌ | Device-bound. |
 | **Hybrid / caBLE (QR)** | ✅ | follows phone's provider | |
 
@@ -36,12 +36,14 @@ run."
 | Tier | Target |
 |---|---|
 | Supported | iCloud Keychain (iOS/iPadOS 18.4+, macOS 15.4+); Google Password Manager (Chrome/Edge 116+, incl. Windows & Android) |
-| Not for derivation | Windows Hello, hardware keys — device-bound |
+| Rejected at `createPasskey()` | Windows Hello, hardware keys — device-bound; no `get()`-path gate today (#13) |
 | Unsupported | Firefox Android, Android WebView, cross-vendor hybrid |
 
-The **iOS 18.4 floor is enforced in code** (`assertPlatformSupportsPrf`), not just
-documented. Windows *users* are supported via Google Password Manager; the
-create-flow steers them there (`providerGuidance`).
+The **iOS 18.4 floor is a conservative user-agent check in code**
+(`assertPlatformSupportsPrf`), not a capability probe — user agents it does not
+recognize pass through to WebAuthn's own typed errors. Windows *users* are
+supported via Google Password Manager; the host calls `providerGuidance()`
+during create to steer them there (see [`integration.md`](./integration.md)).
 
 ## Failure surface (for feature detection)
 
@@ -50,7 +52,7 @@ Unsupported PRF is signalled non-uniformly:
 | Situation | `getClientExtensionResults()` |
 |---|---|
 | Browser ignored the extension | `prf` absent → `PrfUnsupportedError("prf-not-processed")` |
-| Authenticator can't PRF at create | `{ prf: { enabled: false } }` |
+| Authenticator can't PRF at create | `{ prf: { enabled: false } }` → `PrfUnsupportedError("prf-not-enabled")` |
 | `get()` returned no bytes | `{ prf: {} }` → `PrfUnsupportedError("no-prf-results")` |
 
 Ground truth is a real `get()` returning `prf.results.first` of 32 bytes.

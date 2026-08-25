@@ -8,6 +8,43 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 **Pre-1.0 caveat:** while the library is below 1.0, breaking changes may land in
 minor versions. Pin an exact version and read this file before upgrading.
 
+## [0.3.0] — 2026-08-25
+
+### Breaking
+
+- **`seedExportFromPrfBytes` removed from the public API.** It converts
+  already-held PRF bytes to a seed phrase without a fresh passkey ceremony.
+  It was never dangerous — a caller holding PRF bytes already holds the
+  wallet — but its only external use is retaining key material between
+  ceremonies, the pattern this library's derive-use-discard design exists
+  to prevent. The function remains internal. Rationale:
+  [docs/design-decisions.md](docs/design-decisions.md). With this change
+  the custody claim is unconditional: **revealing a seed phrase through
+  this library always requires a fresh passkey ceremony.**
+  (`SeedExportOptions`, used only by the removed export, is no longer
+  public either.)
+
+### Documentation
+
+- **Corrected to match enforcement scope.** Several claims stated
+  protections more broadly than the code enforces. Each is now scoped to
+  where enforcement actually lives: device-bound rejection happens in
+  `createPasskey()` — the `get()`-path applies no gate today (#13, see
+  docs/get-vs-create-ambiguity.md); the iOS 18.4 floor is a conservative
+  user-agent check, not a capability probe; provider steering is
+  host-implemented via `providerGuidance()`; memory hygiene zeroizes what
+  JavaScript can zeroize (the HD root, byte buffers) while derived-key
+  copies and strings are released to garbage collection. No behavior
+  changed — the words now match the code.
+
+### Fixed
+
+- README and demo examples no longer print the recovered seed phrase to
+  the console or the running page log; the demo renders it in a dedicated
+  element with a dismiss that removes it from the DOM.
+- The A↔B cross-device verification row now records the 2026-08-14 field
+  result (Apple-ecosystem combination) instead of a placeholder.
+
 ## [0.2.2] - 2026-08-12
 
 ### Changed
@@ -135,14 +172,15 @@ Initial release — the Milestone-1 reference library (Part A).
   `@stacks/wallet-sdk` and `bitcoinjs-lib`.
 - Signing: Stacks message signatures and Bitcoin PSBT signing, deriving and
   discarding key material internally.
-- PRF layer: passkey create/evaluate wrappers, support detection with a hard
-  iOS 18.4 floor, and provider steering for Windows users toward Google
-  Password Manager.
+- PRF layer: passkey create/evaluate wrappers, support detection with an
+  iOS 18.4 floor (user-agent check), and provider steering for Windows users
+  toward Google Password Manager.
 - Gated, reveal-once seed-phrase export for backup.
 - Standalone browser demo and the initial documentation set (setup, integration
   guide, PRF support matrix).
 
-[Unreleased]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.2...main
+[Unreleased]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.3.0...main
+[0.3.0]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.1.0...v0.2.0

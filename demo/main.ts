@@ -15,6 +15,27 @@ const log = (msg: string): void => {
   out.textContent += `${msg}\n`;
 };
 
+// The seed phrase never goes through log(): it is rendered in its own element
+// and removed from the DOM on dismiss, so it does not persist in the running log.
+const seedPanel = document.getElementById("seed") as HTMLDivElement;
+const seedDismiss = document.getElementById("seed-dismiss") as HTMLButtonElement;
+
+function clearSeed(): void {
+  seedPanel.querySelector("#seed-phrase")?.remove();
+  seedPanel.hidden = true;
+}
+
+function showSeed(phrase: string): void {
+  clearSeed();
+  const code = document.createElement("code");
+  code.id = "seed-phrase";
+  code.textContent = phrase;
+  seedPanel.insertBefore(code, seedDismiss);
+  seedPanel.hidden = false;
+}
+
+seedDismiss.addEventListener("click", clearSeed);
+
 function randomBytes(n: number): Uint8Array {
   const bytes = new Uint8Array(n);
   crypto.getRandomValues(bytes);
@@ -96,7 +117,8 @@ document.getElementById("export")?.addEventListener("click", async () => {
   if (!acknowledged) return;
   try {
     const seed = await exportSeedPhrase({ ...getInput(), acknowledgedBackupWarning: true });
-    log(`SEED (write down — shown once): ${seed.reveal()}`);
+    showSeed(seed.reveal());
+    log("✓ seed phrase revealed above — write it down; it is shown once and is not logged here.");
   } catch (error) {
     handle(error);
   }

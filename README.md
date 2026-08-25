@@ -53,8 +53,11 @@ Appropriate for onboarding and casual/moderate balances. **Not for treasuries.**
 Full guidance for users and integrators:
 [docs/securing-your-funds.md](docs/securing-your-funds.md).
 
-The library never persists anything key-related: the seed is re-derived on
-demand, lives only in page memory, and is zeroized after use. Nothing touches
+The library persists nothing and transmits nothing: the seed is re-derived on
+demand and lives only in page memory. The HD root and the byte buffers the
+library holds are zeroized after use; derived child keys and string values (the
+mnemonic, hex-encoded keys) are released to garbage collection, not overwritten
+— `src/memory.ts` states where that boundary sits. Nothing touches
 localStorage, IndexedDB, cookies, or any server.
 
 ## ⚠ The #1 pitfall: a new passkey is a *new, empty* wallet
@@ -87,11 +90,13 @@ providers today:
 |---|---|
 | **iCloud Keychain** (iOS/iPadOS **18.4+**, macOS **15.4+**) | ✅ supported |
 | **Google Password Manager** (Chrome/Edge 116+, desktop + Android) | ✅ supported |
-| Windows | ✅ **via Google Password Manager** — Windows Hello is **not** supported for derivation (device-bound, would be single-device) |
+| Windows | ✅ **via Google Password Manager** — `createPasskey()` rejects Windows Hello (device-bound, would be single-device) before deriving; the `get()`-path calls apply no such gate today (tracked in [#13](https://github.com/DeOrganized/stacks-passkey-wallet/issues/13), see [docs/get-vs-create-ambiguity.md](docs/get-vs-create-ambiguity.md#checking-backup-eligibility-on-the-get-path)) |
 | Firefox Android, Android WebView | ❌ not supported |
 
-The iOS 18.4 floor is enforced as a **hard runtime check** (earlier versions can
-derive inconsistent bytes across devices). Full detail:
+The iOS 18.4 floor is a conservative **user-agent check**, not a capability
+probe (earlier versions can derive inconsistent bytes across devices); user
+agents it does not recognize pass through to WebAuthn's own typed errors. Full
+detail:
 [docs/prf-support-matrix.md](docs/prf-support-matrix.md).
 
 ## Status & roadmap
@@ -160,7 +165,8 @@ const { stacks, bitcoin } = await deriveAddressesFromPasskey({
 });
 // stacks.address → "SP…", bitcoin.address → "bc1q…"
 
-// 3. Sign — the library derives, signs, and discards the key internally.
+// 3. Sign — your app briefly holds the PRF bytes and zeroes them right after;
+//    everything downstream is derived and discarded inside the library.
 const bytes = await evaluatePrf({ challenge: crypto.getRandomValues(new Uint8Array(32)), rpId: "yourapp.com" });
 const { signature, publicKey } = signStacksMessage(bytes, "hello");
 bytes.fill(0);
@@ -171,7 +177,7 @@ const seed = await exportSeedPhrase({
   rpId: "yourapp.com",
   acknowledgedBackupWarning: true, // set only after the multi-step warning UI
 });
-console.log(seed.reveal()); // the 24-word phrase, once
+showPhraseInYourUi(seed.reveal()); // the 24-word phrase, once — render it in your UI; never console.log it
 ```
 
 See the [integration guide](docs/integration.md) for the full host-app flow and

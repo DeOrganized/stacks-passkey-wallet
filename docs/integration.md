@@ -10,7 +10,7 @@ signup. This is a Milestone-1 skeleton; it accretes as the platform integration
 import { assertPlatformSupportsPrf, providerGuidance, PrfUnsupportedError } from "stacks-passkey-wallet";
 
 try {
-  assertPlatformSupportsPrf();          // hard gate: no WebAuthn, or iOS < 18.4
+  assertPlatformSupportsPrf();          // no WebAuthn, or iOS < 18.4 (user-agent check, not a capability probe)
 } catch (e) {
   if (e instanceof PrfUnsupportedError) {
     // Fall back to Leather/Xverse connect. Do NOT silently proceed.
@@ -64,8 +64,10 @@ const { signature } = signStacksMessage(bytes, message);
 bytes.fill(0);
 ```
 
-The library derives → signs → discards internally; your app never handles raw
-key material. Broadcast is your app's concern.
+Your app briefly holds the PRF bytes between `evaluatePrf()` and the signing
+call and zeroes them immediately after (`bytes.fill(0)`); everything downstream
+— mnemonic, HD root, signing key — is derived and discarded inside the library.
+Broadcast is your app's concern.
 
 ## 4. Backup — keep two actions distinct
 
@@ -79,7 +81,7 @@ import { WALLET_ACTIONS, exportSeedPhrase } from "stacks-passkey-wallet";
 
 // Show a multi-step warning, then:
 const seed = await exportSeedPhrase({ challenge, rpId, acknowledgedBackupWarning: true });
-displayOnce(seed.reveal());   // shown once; never log or transmit
+displayOnce(seed.reveal());   // shown once; never log or transmit — clearing it after display is the host's job
 ```
 
 Surface the backup prompt at first meaningful balance — not buried in settings.

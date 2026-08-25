@@ -106,6 +106,27 @@ cross-validate derived Bitcoin addresses in the test suite. Validating with a
 catches a class of error that is invisible when the same code both produces and
 checks an address.
 
+## Why there's no public bytes-to-phrase export (0.3.0)
+
+Earlier versions exported `seedExportFromPrfBytes`, which converts
+already-held PRF bytes to the seed phrase without a fresh passkey
+ceremony. It was sealed in 0.3.0.
+
+Not as a vulnerability fix: a caller holding PRF bytes already holds the
+wallet — everything derives from them, and no library function changes
+that. It was sealed because an exported function is a recommendation, and
+this one's only external purpose is served by retaining key material
+between ceremonies — the exact pattern this library's derive-use-discard
+design exists to prevent.
+
+The capability remains trivially available to any integrator whose threat
+model calls for it: this is MIT-licensed, and the derivation primitives
+are exported. What changed is that the library no longer endorses the
+pattern by naming it.
+
+One door, one rule: revealing a seed phrase through this library always
+costs a fresh passkey ceremony.
+
 ---
 
 *This document explains rationale and may evolve. The frozen, normative contract

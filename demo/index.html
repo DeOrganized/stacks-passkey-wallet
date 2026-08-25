@@ -13,6 +13,8 @@
       #guidance:empty { display: none; }
       pre { background: #0b1021; color: #d6e2ff; padding: 1rem; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; word-break: break-all; min-height: 3rem; }
       .warn { color: #7a1212; font-size: 0.9rem; }
+      #seed { border: 1px solid #7a1212; border-radius: 8px; padding: 0.8rem; margin: 0.5rem 0; }
+      #seed code { display: block; margin: 0.5rem 0; font-size: 1rem; word-break: break-word; }
     </style>
   </head>
   <body>
@@ -29,6 +31,10 @@
     <button id="derive">2 · Derive Stacks + Bitcoin addresses</button>
     <button id="sign">3 · Sign a test message (Stacks)</button>
     <button id="export">Export seed phrase (backup, shown once)</button>
+    <div id="seed" hidden>
+      <p class="warn">Seed phrase — write it down now. It is shown once and is not logged.</p>
+      <button id="seed-dismiss">I've written it down — clear it from the page</button>
+    </div>
     <pre id="out"></pre>
     <script type="module" src="./main.ts"></script>
   </body>
