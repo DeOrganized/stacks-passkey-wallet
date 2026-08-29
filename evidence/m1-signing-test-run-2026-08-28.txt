@@ -1,0 +1,24 @@
+=== M1 Signing Test Evidence (Stacks message signing + Bitcoin PSBT signing) ===
+Date: 2026-08-28
+Repo: stacks-passkey-wallet
+Commit: 3d09f94647063854b18be04cba2ca5bdb4e0e08d
+Package version: 0.3.0
+npm shasum: c8b2c2304582b3e8c5a1bd40fdd548d6c1a8a294
+Node version: v24.13.0
+Command: npx vitest run test/signing.test.ts --reporter=verbose
+======================================
+
+
+ RUN  v4.1.10 C:/Users/perri/OneDrive/Documents/GitHub/stacks-passkey-wallet
+
+ ✓ test/signing.test.ts > Stacks message signing > message hash matches @stacks/encryption reference (clean-room) 2ms
+ ✓ test/signing.test.ts > Stacks message signing > signs and verifies via public-key recovery 56ms
+ ✓ test/signing.test.ts > Stacks message signing > rejects a tampered message 14ms
+ ✓ test/signing.test.ts > Bitcoin PSBT signing > signs a P2WPKH input with the derived key and finalizes 29ms
+ ✓ test/signing.test.ts > Bitcoin PSBT signing > signs a testnet input — signing key matches the testnet address (coin type 1') 20ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  18:58:15
+   Duration  465ms (transform 71ms, setup 0ms, import 203ms, tests 123ms, environment 0ms)
+
