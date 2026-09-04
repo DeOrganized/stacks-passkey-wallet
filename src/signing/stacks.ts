@@ -199,3 +199,23 @@ export function signStacksTransactionWithRoot(
   }
   return { kind: "complete", transaction: bytes, txid: transaction.txid(), publicKey };
 }
+
+/**
+ * Derive → sign → discard: sign a Stacks transaction with the account-0 key.
+ * The host app never handles raw key material. Same discipline as
+ * signStacksMessage: the root is wiped in `finally`, on success and on every
+ * refusal path alike.
+ */
+export function signStacksTransaction(
+  prfBytes: Uint8Array,
+  transaction: StacksTransactionWire,
+  options: SignStacksTransactionOptions = {},
+): SignStacksTransactionResult {
+  const { salt, ...rest } = options;
+  const { root } = prfBytesToRoot(prfBytes, salt ?? DEFAULT_SALT);
+  try {
+    return signStacksTransactionWithRoot(root, transaction, rest);
+  } finally {
+    root.wipePrivateData();
+  }
+}

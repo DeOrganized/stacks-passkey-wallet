@@ -3,6 +3,7 @@ export {
   hashStacksMessage,
   signStacksMessage,
   signStacksMessageWithRoot,
+  signStacksTransaction,
   signStacksTransactionWithRoot,
   verifyStacksMessage,
   type SignStacksTransactionOptions,

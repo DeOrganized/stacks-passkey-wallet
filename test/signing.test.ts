@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
-import type { HDKey } from "@scure/bip32";
+import { HDKey } from "@scure/bip32";
 import * as btc from "@scure/btc-signer";
 import { hashMessage as refHashMessage } from "@stacks/encryption";
 import {
@@ -30,9 +30,11 @@ import {
   hashStacksMessage,
   signBitcoinPsbt,
   signStacksMessage,
+  signStacksTransaction,
   signStacksTransactionWithRoot,
   verifyStacksMessage,
 } from "../src/signing";
+import { DEFAULT_SALT } from "../src/wallet-identity";
 
 const prf = new Uint8Array(32).fill(0x07);
 
@@ -316,5 +318,94 @@ describe("Stacks transaction signing (WithRoot)", () => {
   it("WithRoot does not wipe the caller's root", async () => {
     signStacksTransactionWithRoot(root, await unsignedTransfer(publicKey, "mainnet"));
     expect(root.privateKey).not.toBeNull();
+  });
+});
+
+describe("Stacks transaction signing (prfBytes entry)", () => {
+  const publicKey = (() => {
+    const { root } = prfBytesToRoot(prf);
+    try {
+      return stacksPublicKeyHex(root);
+    } finally {
+      root.wipePrivateData();
+    }
+  })();
+
+  it("delegates to WithRoot: same seed, same transaction → identical result", async () => {
+    const viaPrf = signStacksTransaction(prf, await unsignedTransfer(publicKey, "mainnet"));
+    const { root } = prfBytesToRoot(prf);
+    try {
+      const viaRoot = signStacksTransactionWithRoot(root, await unsignedTransfer(publicKey, "mainnet"));
+      expect(bytesToHex(viaPrf.transaction)).toBe(bytesToHex(viaRoot.transaction));
+      expect(viaPrf.publicKey).toBe(viaRoot.publicKey);
+      expect(viaPrf.kind).toBe("complete");
+      expect(viaPrf.kind === "complete" && viaRoot.kind === "complete" && viaPrf.txid === viaRoot.txid).toBe(true);
+    } finally {
+      root.wipePrivateData();
+    }
+  });
+
+  it("passes allowUnprotectedAssetMovement through to WithRoot", async () => {
+    const tx = await unsignedContractCall(publicKey, "mainnet", PostConditionMode.Allow, false);
+    expect(signStacksTransaction(prf, tx, { allowUnprotectedAssetMovement: true }).kind).toBe("complete");
+  });
+
+  describe("wipes the derived root in finally", () => {
+    let wipe: ReturnType<typeof vi.spyOn>;
+    beforeEach(() => {
+      wipe = vi.spyOn(HDKey.prototype, "wipePrivateData");
+    });
+    afterEach(() => {
+      wipe.mockRestore();
+    });
+
+    /** The one root the signer derived: wiped exactly once, private key gone. */
+    function expectWipedOnce(): void {
+      expect(wipe).toHaveBeenCalledTimes(1);
+      const root = wipe.mock.instances[0] as unknown as HDKey;
+      expect(root.privateKey).toBeNull();
+    }
+
+    it("on success", async () => {
+      const tx = await unsignedTransfer(publicKey, "mainnet");
+      wipe.mockClear();
+      expect(signStacksTransaction(prf, tx).kind).toBe("complete");
+      expectWipedOnce();
+    });
+
+    it("on the origin-mismatch refusal", async () => {
+      const tx = await unsignedTransfer(foreignPublicKey(), "mainnet");
+      wipe.mockClear();
+      expect(() => signStacksTransaction(prf, tx)).toThrowError(OriginAddressMismatchError);
+      expectWipedOnce();
+      expect(originSignatureHex(tx)).toBe(UNSIGNED);
+    });
+
+    it("on the Allow-mode refusal", async () => {
+      const tx = await unsignedContractCall(publicKey, "mainnet", PostConditionMode.Allow, false);
+      wipe.mockClear();
+      expect(() => signStacksTransaction(prf, tx)).toThrowError(UnprotectedAssetMovementError);
+      expectWipedOnce();
+      expect(originSignatureHex(tx)).toBe(UNSIGNED);
+    });
+  });
+
+  describe("salt", () => {
+    it("defaults to DEFAULT_SALT — same key as the message path", async () => {
+      const implicit = signStacksTransaction(prf, await unsignedTransfer(publicKey, "mainnet"));
+      const explicit = signStacksTransaction(prf, await unsignedTransfer(publicKey, "mainnet"), {
+        salt: DEFAULT_SALT,
+      });
+      expect(bytesToHex(implicit.transaction)).toBe(bytesToHex(explicit.transaction));
+      expect(implicit.publicKey).toBe(signStacksMessage(prf, "parity").publicKey);
+    });
+
+    it("a different salt is a different wallet: the origin fence refuses", async () => {
+      const tx = await unsignedTransfer(publicKey, "mainnet");
+      expect(() => signStacksTransaction(prf, tx, { salt: "some-other-app/v1" })).toThrowError(
+        OriginAddressMismatchError,
+      );
+      expect(originSignatureHex(tx)).toBe(UNSIGNED);
+    });
   });
 });
