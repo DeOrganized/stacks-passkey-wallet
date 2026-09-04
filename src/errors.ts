@@ -47,3 +47,37 @@ export class SeedAlreadyRevealedError extends PasskeyWalletError {
     super("Seed phrase was already revealed once; perform a fresh export to view it again.");
   }
 }
+
+/**
+ * Thrown by the Stacks transaction signer when the account-0 address derived
+ * from the passkey does not equal the transaction's origin spending-condition
+ * address. The wrong passkey answered the ceremony; no signature is applied.
+ */
+export class OriginAddressMismatchError extends PasskeyWalletError {
+  readonly derivedAddress: string;
+  readonly originAddress: string;
+  constructor(derivedAddress: string, originAddress: string) {
+    super(
+      `Refusing to sign: the derived Stacks address ${derivedAddress} is not the ` +
+        `transaction's origin address ${originAddress}.`,
+    );
+    this.derivedAddress = derivedAddress;
+    this.originAddress = originAddress;
+  }
+}
+
+/**
+ * Thrown by the Stacks transaction signer when the transaction's post-condition
+ * mode is Allow and the caller has not opted in. Allow mode permits any asset
+ * movement the contract attempts; refusing it by default keeps "sign an
+ * unprotected asset transfer" a deliberate act rather than a silent one.
+ */
+export class UnprotectedAssetMovementError extends PasskeyWalletError {
+  constructor() {
+    super(
+      "Refusing to sign: post-condition mode is Allow, which permits any asset movement. " +
+        "Use Deny mode with explicit post-conditions, or pass " +
+        "allowUnprotectedAssetMovement: true to sign anyway.",
+    );
+  }
+}
