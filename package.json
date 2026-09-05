@@ -36,6 +36,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "gen:vectors": "tsx scripts/generate-vectors.ts",
+    "gen:vectors:signing": "tsx scripts/generate-signing-vectors.ts",
     "demo": "vite --config demo/vite.config.ts",
     "demo:build": "vite build --config demo/vite.config.ts",
     "prepare": "npm run build",
@@ -50,6 +51,7 @@
     "@stacks/transactions": "^7.5.0"
   },
   "devDependencies": {
+    "@stacks/encryption": "^7.5.0",
     "@stacks/wallet-sdk": "^7.0.0",
     "@types/node": "^22",
     "bitcoinjs-lib": "^7.0.1",

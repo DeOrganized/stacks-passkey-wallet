@@ -69,6 +69,49 @@ call and zeroes them immediately after (`bytes.fill(0)`); everything downstream
 — mnemonic, HD root, signing key — is derived and discarded inside the library.
 Broadcast is your app's concern.
 
+### 3.1 Transaction signing, and the sponsored flow's host-side responsibilities
+
+`signStacksTransaction` signs a transaction you built with
+`@stacks/transactions`' builders and returns either `{ kind: "complete", …, txid }`
+for a standard transaction or `{ kind: "origin-signed", … }` for a sponsored
+one. The README's *Transaction signing* section documents the surface, the two
+typed refusals, and the `allowUnprotectedAssetMovement` flag.
+
+Everything below the signature is yours, and for sponsored transactions that
+is most of the work. The library deliberately ships none of it — a sponsor
+service holds a hot fee-paying key and an allowlist that encodes business
+policy, both of which belong inside your trust boundary, not in a client-side
+MIT library. What it does instead is document the patterns that were designed
+with the first integrator in
+[issue #12](https://github.com/DeOrganized/stacks-passkey-wallet/issues/12):
+
+- **Sponsor verification before paying.** The sponsor is spending its own
+  money, so it re-parses the serialized transaction and checks contract,
+  function, arguments and post-conditions against what it intended to
+  sponsor, and verifies the origin address is bound to the claiming user. It
+  does not trust the client's description of what was signed.
+- **Server-reserved origin nonce.** Issue the nonce as part of an idempotent
+  operation intent — `(operationId, userId, originNonce, fee, tx params)` in
+  one database transaction — so a retry of the same operation returns the same
+  intent, the same unsigned bytes, and (because signing is deterministic) the
+  same signed bytes and txid. Client-side nonce fetching lets parallel tabs
+  collide and lets a timeout retry mint a second valid transaction. Freeze the
+  fee in the intent too on self-paid transactions: the fee is part of the
+  origin-signed bytes.
+- **Persist, then broadcast.** Validate the signed transaction against the
+  stored intent, verify its txid, persist the exact signed bytes and txid in a
+  ready-to-broadcast state, then broadcast those persisted bytes. After an
+  ambiguous timeout, query by txid and retransmit the same bytes; never
+  rebuild, re-estimate, or ask the wallet to re-sign because a broadcast timed
+  out. Reconcile abandoned nonces against the account's chain nonce.
+
+For the standard, self-paid path the same intent-and-broadcast service applies
+minus the sponsorship step. The reference checklist is being proven against a
+live sponsor service in
+[builds-with-skullcoin](https://github.com/DeOrganized/builds-with-skullcoin)
+and graduates into this repository's docs once it has survived contact with a
+real deployment.
+
 ## 4. Backup — keep two actions distinct
 
 Use `WALLET_ACTIONS` so UI copy never conflates the two:
