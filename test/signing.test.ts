@@ -350,6 +350,8 @@ describe("Stacks transaction signing (prfBytes entry)", () => {
     expect(signStacksTransaction(prf, tx, { allowUnprotectedAssetMovement: true }).kind).toBe("complete");
   });
 
+  // Reference wipe-assertion pattern for this suite: spy on HDKey.prototype.wipePrivateData,
+  // then assert it fired once and the instance it fired on has no private key left.
   describe("wipes the derived root in finally", () => {
     let wipe: ReturnType<typeof vi.spyOn>;
     beforeEach(() => {

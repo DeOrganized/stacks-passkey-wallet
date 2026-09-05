@@ -186,6 +186,90 @@ already has a wallet-extension or email sign-in, see
 [docs/integrating-alongside-wallet-auth.md](docs/integrating-alongside-wallet-auth.md)
 for the patterns that keep all three methods coherent behind one entry point.
 
+## Transaction signing
+
+One generic Stacks transaction signer. You build the transaction with
+`@stacks/transactions`' own builders — that is where fees, nonces and
+post-conditions are expressed — and the library signs exactly the bytes you
+hand it, for exactly the wallet the passkey derives.
+
+```ts
+import { evaluatePrf, signStacksTransaction, signStacksTransactionWithRoot } from "stacks-passkey-wallet";
+import { makeUnsignedSTXTokenTransfer } from "@stacks/transactions";
+
+const tx = await makeUnsignedSTXTokenTransfer({
+  recipient, amount, fee, nonce, network,
+  publicKey,            // the account-0 public key of this wallet
+});
+
+const bytes = await evaluatePrf({ challenge, rpId });
+const result = signStacksTransaction(bytes, tx);
+bytes.fill(0);
+
+if (result.kind === "complete") {
+  broadcast(result.transaction);     // serialized signed transaction
+  record(result.txid);               // stable from the moment of signing
+} else {
+  sendToSponsor(result.transaction); // origin-signed; the sponsor adds the fee-payer signature
+}
+```
+
+Signatures:
+
+```ts
+function signStacksTransaction(
+  prfBytes: Uint8Array,
+  transaction: StacksTransactionWire,
+  options?: { salt?: string; allowUnprotectedAssetMovement?: boolean },
+): SignStacksTransactionResult;
+
+function signStacksTransactionWithRoot(
+  root: HDKey,
+  transaction: StacksTransactionWire,
+  options?: { allowUnprotectedAssetMovement?: boolean },
+): SignStacksTransactionResult;
+
+type SignStacksTransactionResult =
+  | { kind: "complete";      transaction: Uint8Array; txid: string; publicKey: string }
+  | { kind: "origin-signed"; transaction: Uint8Array; publicKey: string };
+```
+
+The result kind follows the transaction's own authorization type. A standard
+transaction returns `complete` with the real txid. A sponsored transaction
+returns `origin-signed` with **no txid field of any kind** — the only txid that
+will ever exist is the one your sponsor service reports after it applies the
+fee-payer signature. There is no `network` or `sponsored` option: the
+transaction is the single source of truth for both.
+
+Two refusals, both typed, both applied **before** any signature:
+
+- **`OriginAddressMismatchError`** — the account-0 address derived from the
+  passkey (for the network the transaction's own version byte names) does not
+  equal the transaction's origin address. The wrong passkey answered the
+  ceremony. The error carries `derivedAddress` and `originAddress`. A
+  mismatched `salt` refuses here too — the fence is also your
+  salt-configuration check.
+- **`UnprotectedAssetMovementError`** — the transaction's post-condition mode
+  is `Allow`, which permits any asset movement the contract attempts. Deny mode,
+  with or without post-conditions, signs normally. To sign an Allow-mode
+  transaction anyway, pass `allowUnprotectedAssetMovement: true`; the flag is
+  deliberately uncomfortable to type. The library never inspects the
+  post-conditions themselves — that policy is yours.
+
+**What the caller owns.** Transaction construction, fee estimation, nonce
+management, broadcast, and — for sponsored transactions — the sponsor service
+and everything inside its trust boundary. The library ships client-side
+cryptography only; it never returns, retains, or broadcasts anything beyond the
+signed bytes, and it never mutates the transaction except to apply the origin
+signature. `signStacksTransaction` derives, signs, and wipes the root in a
+`finally` block on every path, including both refusals; the `WithRoot` variant
+signs with a root you already hold and leaves its lifecycle to you.
+
+Frozen signing vectors live in `test/vectors/signing.vectors.json` — seven
+classes, every input recorded, exact bytes in and out, three negative
+controls. An implementation that reproduces them byte-for-byte implements the
+signer.
+
 ## Development
 
 ```bash
@@ -193,12 +277,16 @@ npm install
 npm run typecheck   # tsc --noEmit
 npm test            # vitest — derivation vectors, signing, PRF, export
 npm run build       # tsup → dist/ (ESM + types)
-npm run gen:vectors # regenerate the frozen vectors (cross-validated)
+npm run gen:vectors         # regenerate the frozen derivation vectors (cross-validated)
+npm run gen:vectors:signing # regenerate the frozen signing vectors (cross-validated)
 npm run demo        # runnable browser demo (vite)
 ```
 
-Test vectors are cross-validated against `@stacks/wallet-sdk` (Stacks) and
-`bitcoinjs-lib` (Bitcoin), plus a BIP-84 published golden anchor.
+Derivation vectors are cross-validated against `@stacks/wallet-sdk` (Stacks) and
+`bitcoinjs-lib` (Bitcoin), plus a BIP-84 published golden anchor. Signing vectors
+are cross-validated by deserializing the frozen bytes with `@stacks/transactions`,
+verifying the origin signature, recovering the public key against `@stacks/wallet-sdk`'s
+independent derivation, and recomputing the txid.
 
 ## License & credits
 
