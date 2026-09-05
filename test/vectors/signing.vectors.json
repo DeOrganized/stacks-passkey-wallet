@@ -1,0 +1,224 @@
+{
+  "_comment": "FROZEN Stacks transaction-signing vectors — see docs/wallet-identity.md and README §Transaction signing. Inputs are fixed public byte patterns (test vectors, not real wallets — never fund these addresses). Each entry records every input, the exact unsigned bytes, and the exact expected output; an implementation that reproduces them byte-for-byte implements the signer. Regenerating with different constants is a breaking change.",
+  "salt": "stacks-passkey-wallet/v1",
+  "prfCorpus": {
+    "signer": "0707070707070707070707070707070707070707070707070707070707070707",
+    "foreign": "0808080808080808080808080808080808080808080808080808080808080808",
+    "note": "signer = 32 × 0x07 (the passkey that signs every vector); foreign = 32 × 0x08 (another passkey, used as recipient / contract address, and as the origin of the mismatch control)"
+  },
+  "signerPublicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8",
+  "foreignPublicKey": "0350cf48ad6933bdf7a8798e81b1d948a57e030c8f2d9b3313934ff80ca22bd413",
+  "signatureScheme": "secp256k1 ECDSA, RFC 6979 deterministic (canonical low-s), recoverable VRS as @stacks/transactions serializes it",
+  "generatedBy": "scripts/generate-signing-vectors.ts",
+  "crossValidatedWith": [
+    "@stacks/transactions deserializeTransaction + verifyOrigin (signature recovers to the signer hash)",
+    "@stacks/wallet-sdk (independent account-0 key derivation; recovered public key must match)",
+    "txid recomputed from the frozen bytes",
+    "signed bytes with the signature blanked == unsigned bytes"
+  ],
+  "vectors": [
+    {
+      "name": "standard-transfer-mainnet",
+      "class": 1,
+      "description": "Standard STX transfer, mainnet, Deny mode, no post-conditions → complete",
+      "signerPrfBytesHex": "0707070707070707070707070707070707070707070707070707070707070707",
+      "salt": "stacks-passkey-wallet/v1",
+      "options": {},
+      "input": {
+        "type": "stx-transfer",
+        "network": "mainnet",
+        "originPublicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8",
+        "recipient": "SP3503TC0Q6E817VZES1ZVJF7PX78XJHXD4THPB8Z",
+        "amount": "1000",
+        "fee": "200",
+        "nonce": "7",
+        "memo": "",
+        "sponsored": false
+      },
+      "originAddress": "SP1D2TYTDXM2HPXE8Z8NDF9XGGWYV0ARNH0YTYV71",
+      "unsignedHex": "000000000104005a2d7b4ded051b75c8fa2ad7a7b0873db02b1588000000000000000700000000000000c8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030200000000000516ca01e980b99c809f7f7643fdc9e7b74e8eca3d6900000000000003e800000000000000000000000000000000000000000000000000000000000000000000",
+      "expected": {
+        "kind": "complete",
+        "signedHex": "000000000104005a2d7b4ded051b75c8fa2ad7a7b0873db02b1588000000000000000700000000000000c8000092b63fcf158cffaf4a8978306f088c92be765be2570dd528b5d9b66481c6f7a65dd5f7b4c5c428f9337ce7f6bd85bd11da23bee98ca998f9869caaf3936eb7ef030200000000000516ca01e980b99c809f7f7643fdc9e7b74e8eca3d6900000000000003e800000000000000000000000000000000000000000000000000000000000000000000",
+        "txid": "94bbb3cb363229e0b246421d75c795221cbdd530e12aa35bf8f0f75b3e026a80",
+        "publicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8"
+      }
+    },
+    {
+      "name": "standard-transfer-testnet",
+      "class": 2,
+      "description": "Standard STX transfer, testnet → complete (fence follows the version byte)",
+      "signerPrfBytesHex": "0707070707070707070707070707070707070707070707070707070707070707",
+      "salt": "stacks-passkey-wallet/v1",
+      "options": {},
+      "input": {
+        "type": "stx-transfer",
+        "network": "testnet",
+        "originPublicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8",
+        "recipient": "ST3503TC0Q6E817VZES1ZVJF7PX78XJHXD5NAT461",
+        "amount": "1000",
+        "fee": "200",
+        "nonce": "7",
+        "memo": "",
+        "sponsored": false
+      },
+      "originAddress": "ST1D2TYTDXM2HPXE8Z8NDF9XGGWYV0ARNH3139C44",
+      "unsignedHex": "808000000004005a2d7b4ded051b75c8fa2ad7a7b0873db02b1588000000000000000700000000000000c800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003020000000000051aca01e980b99c809f7f7643fdc9e7b74e8eca3d6900000000000003e800000000000000000000000000000000000000000000000000000000000000000000",
+      "expected": {
+        "kind": "complete",
+        "signedHex": "808000000004005a2d7b4ded051b75c8fa2ad7a7b0873db02b1588000000000000000700000000000000c800010ee486d293fccfc724d952f4e2a88bb62bf785e83dfc3a659a9e5354049ea8820df70ee54bcf7bf6470452943b9fced252b780b8a69c436b7cd92dd64f6f50c603020000000000051aca01e980b99c809f7f7643fdc9e7b74e8eca3d6900000000000003e800000000000000000000000000000000000000000000000000000000000000000000",
+        "txid": "2da0a78ca5c4de5b3b2205ed2a04455a1c52f349e63691797ba0db76a3b1b1e5",
+        "publicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8"
+      }
+    },
+    {
+      "name": "sponsored-transfer-mainnet",
+      "class": 3,
+      "description": "Sponsored STX transfer, mainnet → origin-signed; no txid exists",
+      "signerPrfBytesHex": "0707070707070707070707070707070707070707070707070707070707070707",
+      "salt": "stacks-passkey-wallet/v1",
+      "options": {},
+      "input": {
+        "type": "stx-transfer",
+        "network": "mainnet",
+        "originPublicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8",
+        "recipient": "SP3503TC0Q6E817VZES1ZVJF7PX78XJHXD4THPB8Z",
+        "amount": "1000",
+        "fee": "200",
+        "nonce": "7",
+        "memo": "",
+        "sponsored": true
+      },
+      "originAddress": "SP1D2TYTDXM2HPXE8Z8NDF9XGGWYV0ARNH0YTYV71",
+      "unsignedHex": "000000000105005a2d7b4ded051b75c8fa2ad7a7b0873db02b1588000000000000000700000000000000c80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000029cfc6376255a78451eeb4b129ed8eacffa2feef00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030200000000000516ca01e980b99c809f7f7643fdc9e7b74e8eca3d6900000000000003e800000000000000000000000000000000000000000000000000000000000000000000",
+      "expected": {
+        "kind": "origin-signed",
+        "signedHex": "000000000105005a2d7b4ded051b75c8fa2ad7a7b0873db02b1588000000000000000700000000000000c80000e9e0b25f06bde529dce021e417dbfd5367aa3e5d34c4d242d502aa5871b0b24709d6c90146d0c519d07f0698cc2de68edef67743533bddaf178ba3dfd0c20c9a0029cfc6376255a78451eeb4b129ed8eacffa2feef00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030200000000000516ca01e980b99c809f7f7643fdc9e7b74e8eca3d6900000000000003e800000000000000000000000000000000000000000000000000000000000000000000",
+        "publicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8",
+        "txid": null
+      }
+    },
+    {
+      "name": "contract-call-deny-with-post-conditions",
+      "class": 4,
+      "description": "Contract call, Deny mode with one STX post-condition → complete",
+      "signerPrfBytesHex": "0707070707070707070707070707070707070707070707070707070707070707",
+      "salt": "stacks-passkey-wallet/v1",
+      "options": {},
+      "input": {
+        "type": "contract-call",
+        "network": "mainnet",
+        "originPublicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8",
+        "contractAddress": "SP3503TC0Q6E817VZES1ZVJF7PX78XJHXD4THPB8Z",
+        "contractName": "example",
+        "functionName": "noop",
+        "functionArgs": [],
+        "fee": "300",
+        "nonce": "9",
+        "postConditionMode": "deny",
+        "postConditions": [
+          {
+            "type": "stx-postcondition",
+            "address": "SP1D2TYTDXM2HPXE8Z8NDF9XGGWYV0ARNH0YTYV71",
+            "condition": "eq",
+            "amount": "1000"
+          }
+        ],
+        "sponsored": false
+      },
+      "originAddress": "SP1D2TYTDXM2HPXE8Z8NDF9XGGWYV0ARNH0YTYV71",
+      "unsignedHex": "000000000104005a2d7b4ded051b75c8fa2ad7a7b0873db02b15880000000000000009000000000000012c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000302000000010002165a2d7b4ded051b75c8fa2ad7a7b0873db02b15880100000000000003e80216ca01e980b99c809f7f7643fdc9e7b74e8eca3d69076578616d706c65046e6f6f7000000000",
+      "expected": {
+        "kind": "complete",
+        "signedHex": "000000000104005a2d7b4ded051b75c8fa2ad7a7b0873db02b15880000000000000009000000000000012c00002c775983859d07d2387141d8c01172ed7250c66508aac4acf586fcdbefb7a444002024451c833992305d27c0688afbeabdaeccda618842b0f0b925045c8337330302000000010002165a2d7b4ded051b75c8fa2ad7a7b0873db02b15880100000000000003e80216ca01e980b99c809f7f7643fdc9e7b74e8eca3d69076578616d706c65046e6f6f7000000000",
+        "txid": "901c87ab8ccf4d72368138bfadc29794ed9b95e66e98b208eef65982e4fd03f8",
+        "publicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8"
+      }
+    },
+    {
+      "name": "contract-call-allow-without-flag",
+      "class": 5,
+      "description": "Contract call, Allow mode, no opt-in flag → UnprotectedAssetMovementError",
+      "signerPrfBytesHex": "0707070707070707070707070707070707070707070707070707070707070707",
+      "salt": "stacks-passkey-wallet/v1",
+      "options": {},
+      "input": {
+        "type": "contract-call",
+        "network": "mainnet",
+        "originPublicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8",
+        "contractAddress": "SP3503TC0Q6E817VZES1ZVJF7PX78XJHXD4THPB8Z",
+        "contractName": "example",
+        "functionName": "noop",
+        "functionArgs": [],
+        "fee": "300",
+        "nonce": "9",
+        "postConditionMode": "allow",
+        "postConditions": [],
+        "sponsored": false
+      },
+      "originAddress": "SP1D2TYTDXM2HPXE8Z8NDF9XGGWYV0ARNH0YTYV71",
+      "unsignedHex": "000000000104005a2d7b4ded051b75c8fa2ad7a7b0873db02b15880000000000000009000000000000012c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000301000000000216ca01e980b99c809f7f7643fdc9e7b74e8eca3d69076578616d706c65046e6f6f7000000000",
+      "expected": {
+        "error": "UnprotectedAssetMovementError"
+      }
+    },
+    {
+      "name": "foreign-origin-mainnet",
+      "class": 6,
+      "description": "Transfer whose origin is another passkey's key → OriginAddressMismatchError",
+      "signerPrfBytesHex": "0707070707070707070707070707070707070707070707070707070707070707",
+      "salt": "stacks-passkey-wallet/v1",
+      "options": {},
+      "input": {
+        "type": "stx-transfer",
+        "network": "mainnet",
+        "originPublicKey": "0350cf48ad6933bdf7a8798e81b1d948a57e030c8f2d9b3313934ff80ca22bd413",
+        "recipient": "SP3503TC0Q6E817VZES1ZVJF7PX78XJHXD4THPB8Z",
+        "amount": "1000",
+        "fee": "200",
+        "nonce": "7",
+        "memo": "",
+        "sponsored": false
+      },
+      "originAddress": "SP3503TC0Q6E817VZES1ZVJF7PX78XJHXD4THPB8Z",
+      "unsignedHex": "00000000010400ca01e980b99c809f7f7643fdc9e7b74e8eca3d69000000000000000700000000000000c8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000030200000000000516ca01e980b99c809f7f7643fdc9e7b74e8eca3d6900000000000003e800000000000000000000000000000000000000000000000000000000000000000000",
+      "expected": {
+        "error": "OriginAddressMismatchError",
+        "derivedAddress": "SP1D2TYTDXM2HPXE8Z8NDF9XGGWYV0ARNH0YTYV71",
+        "originAddress": "SP3503TC0Q6E817VZES1ZVJF7PX78XJHXD4THPB8Z"
+      }
+    },
+    {
+      "name": "contract-call-allow-with-flag",
+      "class": 7,
+      "description": "Contract call, Allow mode with allowUnprotectedAssetMovement: true → complete",
+      "signerPrfBytesHex": "0707070707070707070707070707070707070707070707070707070707070707",
+      "salt": "stacks-passkey-wallet/v1",
+      "options": {
+        "allowUnprotectedAssetMovement": true
+      },
+      "input": {
+        "type": "contract-call",
+        "network": "mainnet",
+        "originPublicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8",
+        "contractAddress": "SP3503TC0Q6E817VZES1ZVJF7PX78XJHXD4THPB8Z",
+        "contractName": "example",
+        "functionName": "noop",
+        "functionArgs": [],
+        "fee": "300",
+        "nonce": "9",
+        "postConditionMode": "allow",
+        "postConditions": [],
+        "sponsored": false
+      },
+      "originAddress": "SP1D2TYTDXM2HPXE8Z8NDF9XGGWYV0ARNH0YTYV71",
+      "unsignedHex": "000000000104005a2d7b4ded051b75c8fa2ad7a7b0873db02b15880000000000000009000000000000012c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000301000000000216ca01e980b99c809f7f7643fdc9e7b74e8eca3d69076578616d706c65046e6f6f7000000000",
+      "expected": {
+        "kind": "complete",
+        "signedHex": "000000000104005a2d7b4ded051b75c8fa2ad7a7b0873db02b15880000000000000009000000000000012c0000060b2d137609ccff0a2d553465f3960d866c0c9d88eb0cf3a3e0f974a0eab7707f48311576b4581aee7eb9d5c3aa401d9864e40d252abf95d30df0b249ec48a90301000000000216ca01e980b99c809f7f7643fdc9e7b74e8eca3d69076578616d706c65046e6f6f7000000000",
+        "txid": "90a701f6a2e0b2532c4eec5f837fc66c7e49d9908e41eacc80014d085af63fa2",
+        "publicKey": "02c27fe39f7923f0ba818f8621ee49ac9a4532f21c160d8dc2da3f4b0061bb3ca8"
+      }
+    }
+  ]
+}

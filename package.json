@@ -36,6 +36,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "gen:vectors": "tsx scripts/generate-vectors.ts",
+    "gen:vectors:signing": "tsx scripts/generate-signing-vectors.ts",
     "demo": "vite --config demo/vite.config.ts",
     "demo:build": "vite build --config demo/vite.config.ts",
     "prepare": "npm run build",
