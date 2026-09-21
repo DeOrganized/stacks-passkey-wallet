@@ -1,6 +1,6 @@
 # stacks-passkey-wallet
 
-> ⚠️ **Pre-release — v0.3.0.** Production hardening is in progress and the
+> ⚠️ **Pre-release — v0.4.0.** Production hardening is in progress and the
 > cross-device PRF support matrix is **incomplete** (see
 > [`docs/prf-support-matrix.md`](docs/prf-support-matrix.md)). Adopters inherit
 > these caveats: pin an exact version, and verify on your target passkey
@@ -110,6 +110,7 @@ real devices.
 | Stacks + Bitcoin address derivation | ✅ live, vectors cross-validated |
 | Stacks message signing (RSV) | ✅ live |
 | Bitcoin PSBT signing | ✅ live |
+| Stacks transaction signing (`signStacksTransaction`) — contract calls & token transfers | ✅ live (0.4.0) — see [Transaction signing](#transaction-signing); [issue #1](https://github.com/DeOrganized/stacks-passkey-wallet/issues/1) pt 3 closed by 0.4.0 |
 | Seed-phrase export + independent restore | ✅ verified in Xverse |
 | iCloud Keychain (iOS 18.4+ / macOS 15.4+) | ✅ create + re-derive confirmed |
 | Google Password Manager (desktop + Android) | ✅ create + re-derive confirmed |
@@ -118,7 +119,6 @@ real devices.
 
 | | |
 |---|---|
-| `signStacksTransaction` — contract calls & token transfers | tracked in [issue #1](https://github.com/DeOrganized/stacks-passkey-wallet/issues/1) (pt 3). Message signing and PSBT signing exist today; transaction signing does not. |
 | Cross-device / cross-provider PRF matrix | partially verified by hand — [`prf-support-matrix.md`](docs/prf-support-matrix.md) |
 | Automated browser-mode PRF tests | not yet automated; the manual [checklist](docs/prf-verification-checklist.md) is the current instrument |
 
