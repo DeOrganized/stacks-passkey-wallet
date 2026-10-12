@@ -42,5 +42,8 @@ DeOrganized is this library's test bed, not its subject.
   any build that cleans `dist/` — the prepare/prepublishOnly double-build
   collides with OneDrive file locks (EBUSY on dist files). Resume after.
 - A stale npm login surfaces as E404 "not found" on PUT, not 401 — re-login
-  (browser + security key; no OTP path on this account) before diagnosing
-  further.
+  (browser + security key) before diagnosing further.
+- Publish from a real terminal (PowerShell/Windows Terminal), not from a Claude
+  Code `!` command: without a TTY npm cannot run the browser security-key
+  handshake and fails with EOTP, even with --auth-type=web. Keep OneDrive paused
+  from the first build through the publish.
