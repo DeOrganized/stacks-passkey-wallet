@@ -8,6 +8,56 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 **Pre-1.0 caveat:** while the library is below 1.0, breaking changes may land in
 minor versions. Pin an exact version and read this file before upgrading.
 
+## [0.5.0] — 2026-10-12
+
+A breaking minor under the pre-1.0 caveat above. Nothing in the frozen
+wallet-identity definition changes; every existing address, mnemonic and
+vector is byte-identical.
+
+### Breaking
+
+- **`prfBytesToEntropy`, `prfBytesToMnemonic` and `prfBytesToRoot` removed
+  from the public API.** Each turns PRF bytes into seed material — BIP-39
+  entropy, the 24-word phrase, or a live HD root — with no passkey ceremony.
+  They remain internal; every library function that needs them (address
+  derivation, message, transaction and PSBT signing, the gated export)
+  imports them directly and wipes what it derives.
+
+### Added
+
+- **`deriveAddressesFromMnemonic(mnemonic, options?)`** — the sanctioned
+  "what addresses does this phrase control" call. An already-revealed BIP-39
+  phrase in; the account-0 Stacks + Bitcoin addresses out, in the same shape
+  `deriveAddresses(prfBytes)` returns for the PRF bytes that produced that
+  phrase (`options.network`: `"mainnet"` default, or `"testnet"`). Addresses
+  are computed from public keys; the HD root and every derived node's private
+  key are zero-filled before return, on success and on throw. Throws
+  `KeyDerivationError` for a phrase that is not a valid BIP-39 mnemonic,
+  without echoing it. Type `DeriveAddressesFromMnemonicOptions`.
+
+### Corrected
+
+- **The 0.3.0 custody claim was overstated.** 0.3.0 said that revealing a seed
+  phrase through this library always requires a fresh passkey ceremony. That
+  was not true from 0.3.0 through 0.4.0: `prfBytesToMnemonic`,
+  `prfBytesToRoot` and `prfBytesToEntropy` stayed exported and produced the
+  phrase, or its equivalent, from PRF bytes with no ceremony. The accurate
+  statement, from 0.5.0:
+
+  Holding the PRF bytes is holding the seed. The library exposes no path from PRF bytes to seed material outside the gated ceremony; it does not and cannot prevent code that already holds PRF bytes from deriving the seed independently.
+
+### Migration
+
+- If you imported `prfBytesToMnemonic`, `prfBytesToRoot` or
+  `prfBytesToEntropy`, you were holding seed material outside the ceremony.
+  Use `exportSeedPhrase` for a gated reveal, or `deriveAddressesFromMnemonic`
+  for addresses from a revealed phrase. To sign or derive addresses from PRF
+  bytes, use `signStacksTransaction`, `signStacksMessage`, `signBitcoinPsbt`
+  or `deriveAddresses`, which derive and discard internally. Test fixtures
+  that need a phrase for a known PRF input can take it from the frozen
+  vectors (`test/vectors/derivation.vectors.json`) or rebuild it from the
+  specification in `docs/wallet-identity.md`.
+
 ## [0.4.0] — 2026-09-05
 
 New public API — a minor bump under the pre-1.0 caveat above. Nothing in the
@@ -82,7 +132,7 @@ and vector is byte-identical.
   to prevent. The function remains internal. Rationale:
   [docs/design-decisions.md](docs/design-decisions.md). With this change
   the custody claim is unconditional: **revealing a seed phrase through
-  this library always requires a fresh passkey ceremony.**
+  this library always requires a fresh passkey ceremony.** (overstated; corrected in 0.5.0)
   (`SeedExportOptions`, used only by the removed export, is no longer
   public either.)
 
