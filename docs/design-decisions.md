@@ -106,26 +106,26 @@ cross-validate derived Bitcoin addresses in the test suite. Validating with a
 catches a class of error that is invisible when the same code both produces and
 checks an address.
 
-## Why there's no public bytes-to-phrase export (0.3.0)
+## Why there's no public bytes-to-phrase export (0.3.0, 0.5.0)
 
 Earlier versions exported `seedExportFromPrfBytes`, which converts
 already-held PRF bytes to the seed phrase without a fresh passkey
-ceremony. It was sealed in 0.3.0.
+ceremony. It was sealed in 0.3.0. Three lower-level helpers that do the
+same — `prfBytesToEntropy`, `prfBytesToMnemonic` and `prfBytesToRoot` —
+stayed exported through 0.4.0 and were sealed in 0.5.0.
 
 Not as a vulnerability fix: a caller holding PRF bytes already holds the
 wallet — everything derives from them, and no library function changes
-that. It was sealed because an exported function is a recommendation, and
-this one's only external purpose is served by retaining key material
-between ceremonies — the exact pattern this library's derive-use-discard
-design exists to prevent.
+that. They were sealed because an exported function is a recommendation,
+and these functions' only external purpose is served by retaining key
+material between ceremonies — the exact pattern this library's
+derive-use-discard design exists to prevent.
 
-The capability remains trivially available to any integrator whose threat
-model calls for it: this is MIT-licensed, and the derivation primitives
-are exported. What changed is that the library no longer endorses the
-pattern by naming it.
+Holding the PRF bytes is holding the seed. The library exposes no path from PRF bytes to seed material outside the gated ceremony; it does not and cannot prevent code that already holds PRF bytes from deriving the seed independently.
 
-One door, one rule: revealing a seed phrase through this library always
-costs a fresh passkey ceremony.
+For a phrase that has already been revealed, `deriveAddressesFromMnemonic`
+answers "what addresses does this phrase control" — revealed material in,
+addresses out, key material wiped.
 
 ---
 

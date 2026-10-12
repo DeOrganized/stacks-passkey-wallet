@@ -96,12 +96,14 @@ one thing on this page that you should go do now if you have not.
 
 **How the export works.** The app confirms to the library that it showed you a
 warning first (`acknowledgedBackupWarning`), and you must re-authenticate with
-your passkey at that moment — the library will not produce the phrase without
+your passkey at that moment — the export will not produce the phrase without
 that fresh passkey ceremony. The phrase is then handed to the app **once**; the
 library forgets it immediately and never sends, logs, or stores it. What the app
 does with the phrase after that — display it, clear it, dismiss it — is the
 app's responsibility. If you close the screen without writing it down, you can
 run the export again — but each run produces it exactly once.
+
+Holding the PRF bytes is holding the seed. The library exposes no path from PRF bytes to seed material outside the gated ceremony; it does not and cannot prevent code that already holds PRF bytes from deriving the seed independently.
 
 **How to store it.**
 

@@ -1,6 +1,6 @@
 # stacks-passkey-wallet
 
-> ⚠️ **Pre-release — v0.4.0.** Production hardening is in progress and the
+> ⚠️ **Pre-release — v0.5.0.** Production hardening is in progress and the
 > cross-device PRF support matrix is **incomplete** (see
 > [`docs/prf-support-matrix.md`](docs/prf-support-matrix.md)). Adopters inherit
 > these caveats: pin an exact version, and verify on your target passkey
@@ -48,6 +48,8 @@ the wallet. This is a different trust model from architectures where the passkey
 only signs and the provider never holds spendable key material. Treat the
 account-recovery security of your passkey provider (strong password, 2FA on the
 Apple/Google account, recovery contacts) as part of securing this wallet.
+
+Holding the PRF bytes is holding the seed. The library exposes no path from PRF bytes to seed material outside the gated ceremony; it does not and cannot prevent code that already holds PRF bytes from deriving the seed independently.
 
 Appropriate for onboarding and casual/moderate balances. **Not for treasuries.**
 Full guidance for users and integrators:
