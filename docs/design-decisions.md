@@ -85,7 +85,8 @@ verify against independent implementations.
 ## Crypto stack: the noble/scure family (bitcoinjs-lib for cross-checks only)
 
 All production cryptography uses one consistent family: `@scure/bip39`,
-`@scure/bip32`, `@noble/hashes` (including HKDF), `@noble/curves`, and
+`@scure/bip32`, `@noble/hashes` (including HKDF), `@noble/curves` (a transitive
+dependency, through `@scure/bip32` and `@scure/btc-signer`), and
 `@scure/btc-signer`. Why:
 
 - **One audited, minimal-dependency family.** These libraries are independently

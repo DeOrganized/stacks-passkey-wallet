@@ -291,7 +291,8 @@ Initial release — the Milestone-1 reference library (Part A).
 - Standalone browser demo and the initial documentation set (setup, integration
   guide, PRF support matrix).
 
-[Unreleased]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.4.0...main
+[Unreleased]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.5.0...main
+[0.5.0]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.2...v0.3.0
 [0.2.2]: https://github.com/DeOrganized/stacks-passkey-wallet/compare/v0.2.1...v0.2.2

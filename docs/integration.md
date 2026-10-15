@@ -31,8 +31,8 @@ import { createPasskey, deriveAddressesFromPasskey } from "stacks-passkey-wallet
 
 await createPasskey({ rpName, rpId, userId, userName, challenge });      // biometric tap
 const { stacks, bitcoin } = await deriveAddressesFromPasskey({ challenge, rpId });
-// Register stacks.address + bitcoin.address to the user via your backend
-// (Part B: POST /api/auth/passkey/register). Store addresses + WebAuthn
+// Register stacks.address + bitcoin.address to the user via your backend's
+// passkey-registration endpoint. Store addresses + WebAuthn
 // credential data ONLY — never key material.
 ```
 

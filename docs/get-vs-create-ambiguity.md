@@ -5,8 +5,8 @@ opposite things:
 
 - **Sign in a returning user** — a WebAuthn `get()` (assertion) against an
   existing credential, whose PRF output re-derives the *same* wallet. In this
-  library that is `deriveAddressesFromPasskey()` (and the other `…FromPasskey`
-  calls), each of which performs a fresh `get()` internally.
+  library that is `deriveAddressesFromPasskey()` (and the other `get()`-path
+  calls, `evaluatePrf()` and `exportSeedPhrase()`), each of which performs a fresh `get()` internally.
 - **Sign up a new user** — a WebAuthn `create()` (registration) that mints a
   *new* credential, whose PRF output derives a *new, empty* wallet. In this
   library that is `createPasskey()`.

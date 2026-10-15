@@ -32,7 +32,8 @@ Vite/webpack/esbuild.
 ### Bundler note (Stacks)
 
 `@stacks/transactions` internally bundles the legacy `@noble/secp256k1` v1, while
-this library's derivation uses the v2 `@noble/curves`. Both work, but to avoid
+this library's derivation uses the v2 `@noble/curves` (a transitive dependency,
+through `@scure/bip32` and `@scure/btc-signer`, not a direct one). Both work, but to avoid
 shipping two `@noble` majors, configure your bundler to dedupe `@noble/*` (or
 accept the extra ~KБ). This does not affect correctness.
 
