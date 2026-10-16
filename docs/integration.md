@@ -1,8 +1,8 @@
 # Integration guide
 
 How a host app (e.g. deorganized.com) wires the library into an invisible-wallet
-signup. This is a Milestone-1 skeleton; it accretes as the platform integration
-(Part B) lands in the private repos.
+signup. It reflects the library at v0.5.0 and is updated as integration
+patterns are proven in production.
 
 ## 1. Feature-detect before you offer the flow
 
