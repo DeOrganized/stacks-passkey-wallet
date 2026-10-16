@@ -8,6 +8,12 @@ and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2
 **Pre-1.0 caveat:** while the library is below 1.0, breaking changes may land in
 minor versions. Pin an exact version and read this file before upgrading.
 
+## Unreleased
+
+### Documentation
+
+- `securing-your-funds.md`: new section describing the passkey's RP ID as a security surface, the trade-off between an exact host and a registrable domain, and what to consider either way. `wallet-identity.md`: notes that the RP ID is bound to wallet identity. Thanks to @apeirs for raising this in discussion #16.
+
 ## [0.5.0] — 2026-10-12
 
 A breaking minor under the pre-1.0 caveat above. Nothing in the frozen

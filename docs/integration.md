@@ -170,6 +170,8 @@ Check your host/CDN redirect config to learn which origin users actually land
 on. When in doubt, log `clientDataJSON.origin` from a real ceremony and compare
 it byte-for-byte against `expected_origin`.
 
+The RP ID also determines which pages can derive your users' wallets, not only which origins your server accepts. See [The RP ID as a security surface](securing-your-funds.md#the-rp-id-as-a-security-surface).
+
 ## 7. Restoring into a multi-account wallet (e.g. Xverse)
 
 Some wallets scan more than one multi-account derivation convention when they

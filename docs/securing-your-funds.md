@@ -251,6 +251,31 @@ depend on it.
 provider-custody point and the add-passkey-is-not-a-backup point belong in the
 flow, at the moment they matter.
 
+## The RP ID as a security surface
+
+The wallet is derived from the passkey's PRF output, and the salt the library uses is a public constant. So the boundary around a user's wallet is set by the passkey's RP ID, not by the page that hosts the wallet. Any page served from an origin that can use the RP ID can run the same ceremony and derive the same seed, and the user sees the same prompt either way: the prompt shows the RP ID, not the page asking.
+
+Which origins can use an RP ID:
+
+- the RP ID's own host, plus every subdomain under it when the RP ID is a registrable domain such as `example.com`;
+- any origin listed in a Related Origins file at `https://<rpId>/.well-known/webauthn`.
+
+Pages on any other domain cannot request these passkeys; the browser refuses.
+
+Choosing an RP ID is a trade-off for each integrator:
+
+- An exact host (for example `wallet.example.com`) keeps the trusted surface to that one host. The wallet then works only there.
+- A registrable domain (for example `example.com`) lets one wallet work across every host under it. Every one of those hosts, including preview, staging or third-party-hosted ones, is then able to derive users' seeds.
+
+Things worth considering, whichever you choose:
+
+- what code can run on each origin that can use the RP ID, including user-supplied content and third-party services;
+- who can attach new hosts or change DNS under that domain;
+- whether to publish a Related Origins file, since every listed origin joins the same surface;
+- a Content Security Policy that limits which scripts can run, which reduces what an injection bug on any of those origins can do.
+
+The RP ID is also part of the wallet's identity: see [wallet-identity.md](wallet-identity.md).
+
 ---
 
 Questions or a correction? Open an issue at

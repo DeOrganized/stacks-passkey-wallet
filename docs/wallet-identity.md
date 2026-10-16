@@ -154,3 +154,7 @@ version with `DEFAULT_SALT` unchanged, because mainnet derivation was byte-for-b
 untouched and the previous testnet output was unusable by construction. Such a fix
 must still ship new vectors and be called out in the changelog. The exception does
 not extend to mainnet under any circumstances.
+
+## The RP ID and wallet identity
+
+The PRF output, and therefore the wallet, is bound to the passkey's RP ID. Changing the RP ID gives every user a different credential, a different PRF output and a different wallet; their existing passkeys stop producing their existing wallets, and the exported recovery phrase is the way back to them. For that reason the RP ID behaves like the frozen constants above, and is worth settling before a first user and keeping through any domain move. Why the RP ID is also a security surface: [securing-your-funds.md](securing-your-funds.md).
