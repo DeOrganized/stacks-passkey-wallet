@@ -1,6 +1,6 @@
 # stacks-passkey-wallet: security review
 
-This is the public record of the structured security review of `stacks-passkey-wallet`, and of the platform surfaces that carry the wallet's trust on deorganized.com, the library's production integration. It covers the review conducted in September 2026 and the reviewed changes made through 2026-10-16.
+This is the public record of the structured security review of `stacks-passkey-wallet`, and of the platform surfaces that carry the wallet's trust on deorganized.com, the library's production integration. It covers the review conducted in September 2026 and the reviewed changes made through 2026-10-22.
 
 It describes the work at disposition level: what each defect was and what was done about it. Reproduction detail lives in the internal reader reports and is deliberately not reproduced here. Those reports, and the commit references for the platform's private repositories, are available to the Stacks Endowment on request.
 
@@ -28,6 +28,8 @@ The most important methodological result: **each independent reader found seriou
 
 **2.2 Two independent readers.** Both reads ran from the identical brief with no shared context. Each reader was told to actively construct exploit paths, pin every finding to a file and line in the published artifact or a repository commit, and list what it could not assess. Reader 1 drove the real browser path, using a virtual authenticator running actual WebAuthn ceremonies. Reader 2 exercised the published package against mocked WebAuthn results and ran the test suites.
 
+The two readers were automated review sessions rather than people: Reader 1 was Claude Code and Reader 2 was OpenAI Codex, each run in September 2026. Each ran under the withheld-priors check (§2.3) and pinned every finding to a file and line in the published artifact or a repository commit.
+
 **2.3 Withheld-priors check.** Previously known findings were withheld from both readers: a prior binding-and-continuity audit, open library issues, and a sealed-export design decision. Afterward each was scored. **Every withheld prior was rediscovered by at least one reader (8 of 8), and six of eight by both.** Both readers also independently found that the sealed-export seal was incomplete.
 
 **2.4 Reconciliation.** Where both readers found the same defect, it is recorded as an agreement. Where one found what the other missed, the difference was settled by reproduction, never by majority.
@@ -44,7 +46,7 @@ The most important methodological result: **each independent reader found seriou
 
 **3.4 A read-only diagnose before each fix build acts as a third read.** The fix build began with a read-only look at the surrounding code. It found two defects neither reader had reported, sharing one root cause (§4.3). Every fix build now starts this way.
 
-**3.5 What could not be assessed.** Real-provider PRF behavior on physical iOS, Android and Windows devices and over hybrid transport; provider-account recovery in practice; non-Chrome serialization (only Chrome was driven); an in-app seed-phrase sign-in, which does not yet exist; deployed CSP headers; and the full transitive dependency supply chain. Deployment-state items (network posture, log retention) were closed afterwards by direct operator reads. Real-device behavior is recorded separately in the device matrix ([hardening.md](hardening.md)).
+**3.5 What could not be assessed.** Real-provider PRF behavior on physical iOS, Android and Windows devices and over hybrid transport; provider-account recovery in practice; non-Chrome serialization (only Chrome was driven); an in-app seed-phrase sign-in, which does not yet exist; deployed CSP headers (CSP has since been enforced; see 8.8); and the full transitive dependency supply chain. Deployment-state items (network posture, log retention) were closed afterwards by direct operator reads. Real-device behavior is recorded separately in the device matrix ([hardening.md](hardening.md)).
 
 **3.6 Independent reads are now a standing gate (adopted 2026-10-12).** Any change to the signing ceremony, key or seed handling, sign-in, deletions, the library's public surface, security-review evidence, or a number cited to a grantor or partner gets a read by a reviewer not briefed on the implementation before it merges. Each read is a fresh session, and every finding gets a recorded disposition. §8 lists the reads run under this rule.
 
@@ -100,7 +102,7 @@ A residual group of 21 dormant, never-active external-wallet accounts remains in
 ### 4.5 Low and informational
 
 - A timeout re-runs the create step, which can leave an orphan passkey (scheduled).
-- Script injection on the host page equals key compromise. This is accepted as hot-wallet class; a content security policy is owed.
+- Script injection on the host page equals key compromise. This is accepted as hot-wallet class; a content security policy is owed (delivered 2026-10-22; see 8.8).
 - The browser-version floor for PRF consistency can be bypassed (library release).
 - The sign-in path's backup gate (tracked publicly as library issue #13).
 - An acknowledgement flag is checked by truthiness (library release).
@@ -154,7 +156,7 @@ Library changes link to the public repository. The platform's repositories are p
 
 Both readers found the wallet's core cryptographic properties intact. The defects found were in the platform's integration and in the accuracy of claims at the library's edges. They were fixed where they were live and are scheduled where they are not.
 
-## 8. Continued review, 2026-09-25 to 2026-10-16
+## 8. Continued review, 2026-09-25 to 2026-10-22
 
 Changes to the wallet's trust surfaces after the September review, each with how it was reviewed.
 
@@ -183,6 +185,8 @@ Three independent reads ran before merge.
 **8.7 Method in this window.** Every change in §8.4 and §8.6 passed a five-run test bar and at least one independent read before merge. Several reads returned "not mergeable". Every finding was fixed and read again before the merge. The §3.7 rule was added after a display defect reached production with no loss of funds.
 
 **8.8 External finding: the RP ID as the wallet's boundary (2026-10-15).** An external reviewer noted in the library's public discussions that, because the PRF salt is a public constant, the boundary around a user's wallet is the passkey's RP ID rather than the page that hosts the wallet: any origin able to use the RP ID can run the same ceremony and derive the same seed, and the prompt looks the same. The September threat model had not named hosts sharing the RP ID as a trust boundary. An audit of the platform's hosts found, among those identified and probed, none that is third-party, serves user-supplied code or is dangling, and no Related Origins file. The library's documentation now describes the RP ID as a security surface and as part of wallet identity ([securing-your-funds.md](../securing-your-funds.md#the-rp-id-as-a-security-surface)). Further hardening of the platform's hosts is scheduled for immediately after this milestone, including a Content Security Policy, which the platform does not yet serve.
+
+- **2026-10-22:** Content Security Policy enforced on deorganized.com (commit reference in the internal record), after a walk of the member routes under the enforced policy, including a live send. `'wasm-unsafe-eval'` is allowed solely for code that browser extensions inject into pages; the application itself compiles no WebAssembly. A report-only copy of the policy stays in place for one cycle.
 
 ---
 
